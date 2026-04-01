@@ -1395,7 +1395,39 @@
 			document.fonts.ready.then(function() { draw(); });
 		}
 
-		// Start animation immediately
+		// Preload 5 seconds of animation so it's already active on page load
+		(function preload() {
+			var PRELOAD_MS = 5000;
+			var step = FRAME_MS;
+			animRunning = true;
+			lastFrame = performance.now() - PRELOAD_MS;
+			anim.lastSpawn = lastFrame;
+			anim.nextDelay = rand(500, 1500);
+			for (var t = 0; t < PRELOAD_MS; t += step) {
+				var now = lastFrame + t + step;
+				var dt = step;
+				// Spawn
+				if (now - anim.lastSpawn > anim.nextDelay) {
+					spawnLine();
+					anim.lastSpawn = now;
+					anim.nextDelay = rand(600, 1500);
+				}
+				// Update lines
+				for (var i = anim.lines.length - 1; i >= 0; i--) {
+					var done = updateLine(anim.lines[i], dt);
+					if (done) { anim.lines[i].el.remove(); anim.lines.splice(i, 1); }
+				}
+				// Update ripples
+				for (var i = anim.ripples.length - 1; i >= 0; i--) {
+					var done = updateRipple(anim.ripples[i], now);
+					if (done) { cleanupRipple(anim.ripples[i]); anim.ripples.splice(i, 1); }
+				}
+				lastFrame = now;
+			}
+			anim.lastSpawn = performance.now() - (PRELOAD_MS - (anim.lastSpawn - (lastFrame - PRELOAD_MS + step)));
+			lastFrame = 0; // reset so animLoop calculates fresh dt
+			animRunning = false;
+		})();
 		startAnimation();
 
 		// Pause when off-screen (skip initial callback to avoid race)
