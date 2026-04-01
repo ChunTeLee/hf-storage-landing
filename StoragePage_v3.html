@@ -1111,8 +1111,8 @@
 			if (dotsG) {
 				dotsG.innerHTML = '';
 				geo.dotEls = []; // 2D array of dot SVG elements
-				var cols = Math.floor(fw / gapX) + 1;
-				var rows = Math.floor(fh / gapY) + 1;
+				var cols = Math.round(fw / gapX) + 1;
+				var rows = Math.round(fh / gapY) + 1;
 				geo.dotCols = cols; geo.dotRows = rows;
 				var dotOpacity = 0.22;
 				for (var row = 0; row < rows; row++) {
