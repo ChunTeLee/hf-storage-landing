@@ -1071,9 +1071,10 @@
 			var mbg = document.createElementNS(NS, 'rect');
 			mbg.setAttribute('width', W); mbg.setAttribute('height', H); mbg.setAttribute('fill', 'white');
 			mask.appendChild(mbg);
+			var maskInsetY = fh * 0.08; // reduce vertical mask by 8% on each side
 			var mr = document.createElementNS(NS, 'rect');
-			mr.setAttribute('x',fL); mr.setAttribute('y',fT);
-			mr.setAttribute('width',fw); mr.setAttribute('height',fh); mr.setAttribute('fill','black');
+			mr.setAttribute('x',fL); mr.setAttribute('y',fT + maskInsetY);
+			mr.setAttribute('width',fw); mr.setAttribute('height',fh - maskInsetY * 2); mr.setAttribute('fill','black');
 			mask.appendChild(mr);
 			defsEl.appendChild(mask);
 
@@ -1318,11 +1319,23 @@
 		}
 
 		function cleanupRipple(ripple) {
+			// Only restore dots that aren't claimed by another active ripple
 			for (var i = 0; i < ripple.dots.length; i++) {
 				var dot = ripple.dots[i];
-				dot.el.setAttribute('fill', 'rgba(255,255,255,' + dot.baseOpacity.toFixed(4) + ')');
-				dot.el.setAttribute('r', '0.5');
-				dot.el.removeAttribute('opacity');
+				var claimedByOther = false;
+				for (var j = 0; j < anim.ripples.length; j++) {
+					var other = anim.ripples[j];
+					if (other === ripple) continue;
+					for (var k = 0; k < other.dots.length; k++) {
+						if (other.dots[k].el === dot.el) { claimedByOther = true; break; }
+					}
+					if (claimedByOther) break;
+				}
+				if (!claimedByOther) {
+					dot.el.setAttribute('fill', 'rgba(255,255,255,' + dot.baseOpacity.toFixed(4) + ')');
+					dot.el.setAttribute('r', '0.5');
+					dot.el.removeAttribute('opacity');
+				}
 			}
 		}
 
