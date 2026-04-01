@@ -1155,7 +1155,7 @@
 		// ==================== Animation system ====================
 		var anim = { lines: [], ripples: [], lastSpawn: 0, nextDelay: 1000 };
 		var animRunning = false, animFrameId = null;
-		var MAX_LINES = 4;
+		var MAX_LINES = 8;
 		var SPAWN_DIST = 50; // pixels outside the rim where lines spawn
 
 		function spawnLine() {
@@ -1163,15 +1163,19 @@
 			var W=geo.W, H=geo.H, fL=geo.fL, fT=geo.fT, fRi=geo.fRi, fB=geo.fB;
 			if (W === 0) return;
 
-			// Pick edge: left 30%, right 30%, bottom 40%
+			// Pick edge: top 20%, left 20%, right 20%, bottom 40%
 			var r = Math.random();
-			var edge = r < 0.3 ? 'left' : r < 0.6 ? 'right' : 'bottom';
+			var edge = r < 0.2 ? 'top' : r < 0.4 ? 'left' : r < 0.6 ? 'right' : 'bottom';
 
 			// Pick t (40% chance snap to perspective line)
 			var t = Math.random() < 0.4 ? Math.round(Math.random() * N) / N : Math.random();
 
 			var rimX, rimY, floorX, floorY, outX, outY;
-			if (edge === 'left') {
+			if (edge === 'top') {
+				rimX = lerp(0, W, t); rimY = 0;
+				floorX = lerp(fL, fRi, t); floorY = fT;
+				outX = rimX; outY = -SPAWN_DIST;
+			} else if (edge === 'left') {
 				rimX = 0; rimY = lerp(0, H, t);
 				floorX = fL; floorY = lerp(fT, fB, t);
 				outX = -SPAWN_DIST; outY = rimY;
@@ -1301,15 +1305,12 @@
 					var distFade = 1 - dot.dist / ripple.maxR;
 					var timeFade = 1 - progress;
 					var blueStrength = distFade * timeFade;
+					// Only update when blue is visible — never restore mid-animation
+					// (cleanup handles restoration)
 					if (blueStrength > 0.02) {
 						dot.el.setAttribute('fill', BLUE);
 						dot.el.setAttribute('r', (0.5 + blueStrength * 0.5).toFixed(3));
 						dot.el.setAttribute('opacity', Math.max(dot.baseOpacity, blueStrength * 0.9).toFixed(3));
-					} else {
-						// Restore to base when blue fades out
-						dot.el.setAttribute('fill', 'rgba(255,255,255,' + dot.baseOpacity.toFixed(4) + ')');
-						dot.el.setAttribute('r', '0.5');
-						dot.el.removeAttribute('opacity');
 					}
 				}
 			}
@@ -1337,7 +1338,7 @@
 			if (now - anim.lastSpawn > anim.nextDelay) {
 				spawnLine();
 				anim.lastSpawn = now;
-				anim.nextDelay = rand(1000, 2500);
+				anim.nextDelay = rand(600, 1500);
 			}
 
 			// Update lines (ripple is triggered inside updateLine when head reaches floor)
