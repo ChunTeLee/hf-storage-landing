@@ -80,7 +80,7 @@
 		<!-- SECTION 1: HERO                              -->
 		<!-- ============================================ -->
 		<section id="hero-section"
-			class="relative mx-auto flex max-w-7xl flex-col items-center text-balance border-l border-r border-b border-gray-200/50 dark:border-[#141c2e] px-4 pb-16 pt-8 text-center sm:px-6 sm:pt-12 lg:px-8"
+			class="relative mx-auto flex max-w-7xl flex-col items-center text-balance border-l border-r border-b border-gray-200/50 dark:border-[#141c2e] px-4 pb-16 pt-12 text-center sm:px-6 sm:pt-16 lg:px-8 lg:pt-20"
 		>
 			<div class="absolute inset-0 bg-[url('https://cdn-uploads.huggingface.co/production/uploads/5f17f0a0925b9863e28ad517/7yYe9E-d38GWl6bnEUhhG.png')] bg-cover bg-center bg-no-repeat opacity-30 dark:opacity-15"></div>
 			<svg id="bucket-svg" class="absolute inset-0 pointer-events-none" width="100%" height="100%" overflow="visible" xmlns="http://www.w3.org/2000/svg">
@@ -1267,76 +1267,87 @@
 
 		function createRipple(cx, cy) {
 			if (!geo.dotEls) return;
-			var maxR = 60;
-			var duration = rand(3000, 5000);
-			var dots = [];
+			anim.ripples.push({
+				cx: cx, cy: cy,
+				startTime: performance.now(),
+				duration: rand(3000, 5000),
+				maxR: 60
+			});
+		}
+
+		// Each frame: compute max blue strength per dot across ALL ripples, then apply
+		function updateAllRipples(now) {
+			if (!geo.dotEls || anim.ripples.length === 0) return;
 			var gx = geo.gapX, gy = geo.gapY;
 			var ox = geo.dotsOX, oy = geo.dotsOY;
 
-			// Find dot grid indices near (cx, cy) within maxR
-			var colStart = Math.max(0, Math.floor((cx - maxR - ox) / gx));
-			var colEnd = Math.min(geo.dotCols - 1, Math.ceil((cx + maxR - ox) / gx));
-			var rowStart = Math.max(0, Math.floor((cy - maxR - oy) / gy));
-			var rowEnd = Math.min(geo.dotRows - 1, Math.ceil((cy + maxR - oy) / gy));
+			// Track which dots are affected and their max blue strength
+			var affected = {}; // key = "row,col" → { el, maxStrength, baseOpacity }
 
-			for (var row = rowStart; row <= rowEnd; row++) {
-				for (var col = colStart; col <= colEnd; col++) {
-					var dx = ox + col * gx;
-					var dy = oy + row * gy;
-					var d = dist(cx, cy, dx, dy);
-					if (d > maxR) continue;
-					var el = geo.dotEls[row] && geo.dotEls[row][col];
-					if (!el) continue;
-					dots.push({ el: el, dist: d, baseOpacity: parseFloat(el.dataset.baseOpacity) || 0 });
+			// Remove expired ripples first
+			for (var i = anim.ripples.length - 1; i >= 0; i--) {
+				if (now - anim.ripples[i].startTime >= anim.ripples[i].duration) {
+					anim.ripples.splice(i, 1);
 				}
 			}
 
-			anim.ripples.push({ cx:cx, cy:cy, startTime: performance.now(), duration: duration, maxR: maxR, dots: dots });
-		}
+			// Compute max blue strength per dot across all active ripples
+			for (var i = 0; i < anim.ripples.length; i++) {
+				var rip = anim.ripples[i];
+				var elapsed = now - rip.startTime;
+				var progress = elapsed / rip.duration;
+				var wavefront = progress * rip.maxR;
 
-		function updateRipple(ripple, now) {
-			var elapsed = now - ripple.startTime;
-			var progress = elapsed / ripple.duration;
-			if (progress >= 1) return true; // done
+				var colStart = Math.max(0, Math.floor((rip.cx - rip.maxR - ox) / gx));
+				var colEnd = Math.min(geo.dotCols - 1, Math.ceil((rip.cx + rip.maxR - ox) / gx));
+				var rowStart = Math.max(0, Math.floor((rip.cy - rip.maxR - oy) / gy));
+				var rowEnd = Math.min(geo.dotRows - 1, Math.ceil((rip.cy + rip.maxR - oy) / gy));
 
-			var wavefront = progress * ripple.maxR;
-			for (var i = 0; i < ripple.dots.length; i++) {
-				var dot = ripple.dots[i];
-				if (dot.dist <= wavefront) {
-					var distFade = 1 - dot.dist / ripple.maxR;
-					var timeFade = 1 - progress;
-					var blueStrength = distFade * timeFade;
-					// Only update when blue is visible — never restore mid-animation
-					// (cleanup handles restoration)
-					if (blueStrength > 0.02) {
-						dot.el.setAttribute('fill', BLUE);
-						dot.el.setAttribute('r', (0.5 + blueStrength * 0.5).toFixed(3));
-						dot.el.setAttribute('opacity', Math.max(dot.baseOpacity, blueStrength * 0.9).toFixed(3));
+				for (var row = rowStart; row <= rowEnd; row++) {
+					for (var col = colStart; col <= colEnd; col++) {
+						var dx = ox + col * gx;
+						var dy = oy + row * gy;
+						var d = dist(rip.cx, rip.cy, dx, dy);
+						if (d > rip.maxR || d > wavefront) continue;
+						var el = geo.dotEls[row] && geo.dotEls[row][col];
+						if (!el) continue;
+						var distFade = 1 - d / rip.maxR;
+						var timeFade = 1 - progress;
+						var strength = distFade * timeFade;
+						var key = row + ',' + col;
+						if (!affected[key] || strength > affected[key].maxStrength) {
+							affected[key] = { el: el, maxStrength: strength, baseOpacity: parseFloat(el.dataset.baseOpacity) || 0 };
+						}
 					}
 				}
 			}
-			return false;
-		}
 
-		function cleanupRipple(ripple) {
-			// Only restore dots that aren't claimed by another active ripple
-			for (var i = 0; i < ripple.dots.length; i++) {
-				var dot = ripple.dots[i];
-				var claimedByOther = false;
-				for (var j = 0; j < anim.ripples.length; j++) {
-					var other = anim.ripples[j];
-					if (other === ripple) continue;
-					for (var k = 0; k < other.dots.length; k++) {
-						if (other.dots[k].el === dot.el) { claimedByOther = true; break; }
-					}
-					if (claimedByOther) break;
-				}
-				if (!claimedByOther) {
-					dot.el.setAttribute('fill', 'rgba(255,255,255,' + dot.baseOpacity.toFixed(4) + ')');
-					dot.el.setAttribute('r', '0.5');
-					dot.el.removeAttribute('opacity');
+			// Apply: set blue for affected dots, restore previously-blue dots that are no longer affected
+			// Track which dots were blue last frame
+			if (!anim._prevBlue) anim._prevBlue = {};
+			var newBlue = {};
+
+			for (var key in affected) {
+				var info = affected[key];
+				if (info.maxStrength > 0.02) {
+					info.el.setAttribute('fill', BLUE);
+					info.el.setAttribute('r', (0.5 + info.maxStrength * 0.5).toFixed(3));
+					info.el.setAttribute('opacity', Math.max(info.baseOpacity, info.maxStrength * 0.9).toFixed(3));
+					newBlue[key] = info;
 				}
 			}
+
+			// Restore dots that were blue last frame but aren't now
+			for (var key in anim._prevBlue) {
+				if (!newBlue[key]) {
+					var info = anim._prevBlue[key];
+					info.el.setAttribute('fill', 'rgba(255,255,255,' + info.baseOpacity.toFixed(4) + ')');
+					info.el.setAttribute('r', '0.5');
+					info.el.removeAttribute('opacity');
+				}
+			}
+
+			anim._prevBlue = newBlue;
 		}
 
 		var FRAME_MS = 16; // ~60fps
@@ -1363,14 +1374,8 @@
 				}
 			}
 
-			// Update ripples
-			for (var i = anim.ripples.length - 1; i >= 0; i--) {
-				var done = updateRipple(anim.ripples[i], now);
-				if (done) {
-					cleanupRipple(anim.ripples[i]);
-					anim.ripples.splice(i, 1);
-				}
-			}
+			// Update all ripples in one pass (handles overlaps correctly)
+			updateAllRipples(now);
 
 			animFrameId = setTimeout(animLoop, FRAME_MS);
 		}
@@ -1431,10 +1436,7 @@
 					if (done) { anim.lines[i].el.remove(); anim.lines.splice(i, 1); }
 				}
 				// Update ripples
-				for (var i = anim.ripples.length - 1; i >= 0; i--) {
-					var done = updateRipple(anim.ripples[i], now);
-					if (done) { cleanupRipple(anim.ripples[i]); anim.ripples.splice(i, 1); }
-				}
+				updateAllRipples(now);
 				lastFrame = now;
 			}
 			anim.lastSpawn = performance.now() - (PRELOAD_MS - (anim.lastSpawn - (lastFrame - PRELOAD_MS + step)));
