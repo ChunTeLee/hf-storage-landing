@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Security &amp; Compliance — Version 1</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script>
+	tailwind.config = {
+		darkMode: 'class',
+		theme: {
+			extend: {
+				fontFamily: {
+					sans: ['"Source Sans Pro"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+					mono: ['"IBM Plex Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+				},
+				colors: {
+					gray: {
+						925: '#111827',
+					}
+				}
+			}
+		}
+	}
+	</script>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+	<style>
+		.sc-page-bg { background: #030712; }
+		.tag-pill-left {
+			border: 1px solid transparent;
+			background: linear-gradient(#030712, #030712) padding-box,
+						linear-gradient(to left, #2B7FFF 0%, #1e2939 40%, #1e2939 100%) border-box;
+		}
+		.tag-pill-right {
+			border: 1px solid transparent;
+			background: linear-gradient(#030712, #030712) padding-box,
+						linear-gradient(to right, #2B7FFF 0%, #1e2939 40%, #1e2939 100%) border-box;
+		}
+		.sc-grid-fade {
+			-webkit-mask-image: radial-gradient(ellipse 60% 70% at 50% 50%, black 10%, transparent 100%);
+			mask-image: radial-gradient(ellipse 60% 70% at 50% 50%, black 10%, transparent 100%);
+		}
+		@media (max-width: 1023px) {
+			.tag-pill-left,
+			.tag-pill-right {
+				border: 1px solid #1e2939;
+				background: #030712;
+			}
+		}
+	</style>
+</head>
+<body class="bg-gradient-to-b min-h-screen from-white via-gray-50 to-white dark:from-gray-950 dark:via-gray-925 dark:to-gray-950 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+	<div class="mx-auto w-full max-w-7xl">
+
+		<section class="relative overflow-hidden rounded-3xl" style="background: #030712;">
+			<!-- Desktop layout (lg+) -->
+			<div class="relative mx-auto hidden lg:block" style="width: 100%; height: 291px;">
+
+				<!-- Background grid: 100px horizontal / 50px vertical spacing, fading from center -->
+				<div class="sc-grid-fade absolute inset-0" style="background-image: linear-gradient(to right, #1e2939 1px, transparent 1px), linear-gradient(to bottom, #1e2939 1px, transparent 1px); background-size: 100px 50px; background-position: 50% 40px;"></div>
+
+				<!-- Grid line cutoffs -->
+				<div class="absolute pointer-events-none" style="left: calc(50% - 50px); top: 89px; width: 100px; height: 3px; background: #030712;"></div>
+				<div class="absolute pointer-events-none" style="left: calc(50% - 50px); top: 239px; width: 100px; height: 3px; background: #030712;"></div>
+
+				<!-- "Security & Compliance" pill -->
+				<div
+					class="sc-page-bg absolute left-1/2 -translate-x-1/2 flex items-center justify-center rounded-full border border-[#1e2939] font-mono text-base"
+					style="top: 25px; padding: 4px 16px; color: #d1d5dc;"
+				>Security &amp; Compliance</div>
+
+				<!-- "bucket" label -->
+				<div
+					class="absolute left-1/2 -translate-x-1/2 font-mono text-sm"
+					style="top: 75px; color: #2B7FFF;"
+				>bucket</div>
+
+				<!-- Bucket icon -->
+				<div class="sc-page-bg absolute left-1/2 -translate-x-1/2" style="top: 108px;"><svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><path opacity="0.25" d="M48.0014 5.33472H16.0014C10.1103 5.33472 5.33472 10.1103 5.33472 16.0014V48.0014C5.33472 53.8924 10.1103 58.668 16.0014 58.668H48.0014C53.8924 58.668 58.668 53.8924 58.668 48.0014V16.0014C58.668 10.1103 53.8924 5.33472 48.0014 5.33472Z" fill="#2B7FFF"/><path opacity="0.5" d="M41.3327 14.668H22.666C18.2477 14.668 14.666 18.2497 14.666 22.668V41.3346C14.666 45.7529 18.2477 49.3346 22.666 49.3346H41.3327C45.7509 49.3346 49.3327 45.7529 49.3327 41.3346V22.668C49.3327 18.2497 45.7509 14.668 41.3327 14.668Z" fill="#2B7FFF"/><path d="M36 24H28C25.7908 24 24 25.7908 24 28V36C24 38.2092 25.7908 40 28 40H36C38.2092 40 40 38.2092 40 36V28C40 25.7908 38.2092 24 36 24Z" fill="#2B7FFF"/></svg></div>
+
+				<!-- Blue connector lines -->
+				<div class="absolute pointer-events-none" style="left: calc(50% - 92px); top: 140px; width: 60px; height: 1px; background: #2B7FFF;"></div>
+				<div class="absolute pointer-events-none" style="left: calc(50% + 32px); top: 140px; width: 60px; height: 1px; background: #2B7FFF;"></div>
+				<div class="absolute pointer-events-none" style="left: calc(50% - 50px); top: 140px; width: 1px; height: 50px; background: #2B7FFF;"></div>
+				<div class="absolute pointer-events-none" style="left: calc(50% + 50px); top: 140px; width: 1px; height: 50px; background: #2B7FFF;"></div>
+				<div class="absolute pointer-events-none" style="left: calc(50% - 60px); top: 190px; width: 10px; height: 1px; background: #2B7FFF;"></div>
+				<div class="absolute pointer-events-none" style="left: calc(50% + 50px); top: 190px; width: 10px; height: 1px; background: #2B7FFF;"></div>
+
+				<!-- AES-256 encryption pill (left, upper) -->
+				<div
+					class="tag-pill-left absolute flex items-center gap-[7px] rounded-full py-[5px]"
+					style="right: calc(50% + 92px); top: 122px; padding-left: 10px; padding-right: 10px;"
+				>
+					<svg class="size-4 shrink-0" style="color: #99A1AF;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+						<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+						<path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+					</svg>
+					<span class="whitespace-nowrap text-base text-white">AES-256 encryption</span>
+				</div>
+
+				<!-- Audit logs pill (left, lower) -->
+				<div
+					class="tag-pill-left absolute flex items-center gap-[7px] rounded-full py-[5px]"
+					style="right: calc(50% + 60px); top: 172px; padding-left: 10px; padding-right: 10px;"
+				>
+					<svg class="size-4 shrink-0" style="color: #99A1AF;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
+						<path d="M14 2v4a2 2 0 0 0 2 2h4M10 9H8m8 4H8m8 4H8"/>
+					</svg>
+					<span class="whitespace-nowrap text-base text-white">Audit logs</span>
+				</div>
+
+				<!-- SSO & RBAC pill (right, upper) -->
+				<div
+					class="tag-pill-right absolute flex items-center gap-[7px] rounded-full py-[5px]"
+					style="left: calc(50% + 92px); top: 122px; padding-left: 10px; padding-right: 10px;"
+				>
+					<svg class="size-4 shrink-0" style="color: #99A1AF;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+						<circle cx="9" cy="7" r="4"/>
+					</svg>
+					<span class="whitespace-nowrap text-base text-white">SSO &amp; RBAC</span>
+				</div>
+
+				<!-- US & EU regions pill (right, lower) -->
+				<div
+					class="tag-pill-right absolute flex items-center gap-[7px] rounded-full py-[5px]"
+					style="left: calc(50% + 60px); top: 172px; padding-left: 10px; padding-right: 10px;"
+				>
+					<svg class="size-4 shrink-0" style="color: #99A1AF;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+						<circle cx="12" cy="12" r="10"/>
+						<path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/>
+					</svg>
+					<span class="whitespace-nowrap text-base text-white">US &amp; EU regions</span>
+				</div>
+
+				<!-- SOC2 + GDPR badges -->
+				<div class="absolute left-1/2 -translate-x-1/2 flex items-center" style="top: 224px; gap: 12px;">
+					<img src="https://cdn-media.huggingface.co/marketing/pmh-page/soc2.png" alt="SOC 2 Type II" title="SOC 2 Type II certified" style="height: 32px; opacity: 0.7;" class="brightness-125" />
+					<img src="https://cdn-media.huggingface.co/marketing/pmh-page/gdpr.png" alt="GDPR Compliant" title="GDPR compliant" style="height: 32px; opacity: 0.7;" class="brightness-125" />
+				</div>
+			</div>
+
+			<!-- Mobile/tablet fallback (< lg) -->
+			<div id="sc-mobile" class="relative flex flex-col items-center px-6 py-10 lg:hidden">
+				<div class="sc-grid-fade absolute inset-0" style="background-image: linear-gradient(to right, #1e2939 1px, transparent 1px), linear-gradient(to bottom, #1e2939 1px, transparent 1px); background-size: 100px 50px; background-position: 50% 40px;"></div>
+
+				<span class="sc-page-bg relative mb-8 inline-block rounded-full border border-[#1e2939] px-4 py-1 font-mono text-sm" data-sc-cut style="color: #d1d5dc;">Security &amp; Compliance</span>
+
+				<div class="relative mb-3 px-3 font-mono text-sm" data-sc-cut style="color: #2B7FFF;">bucket</div>
+				<div class="relative mb-6" data-sc-cut>
+					<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><path opacity="0.25" d="M48.0014 5.33472H16.0014C10.1103 5.33472 5.33472 10.1103 5.33472 16.0014V48.0014C5.33472 53.8924 10.1103 58.668 16.0014 58.668H48.0014C53.8924 58.668 58.668 53.8924 58.668 48.0014V16.0014C58.668 10.1103 53.8924 5.33472 48.0014 5.33472Z" fill="#2B7FFF"/><path opacity="0.5" d="M41.3327 14.668H22.666C18.2477 14.668 14.666 18.2497 14.666 22.668V41.3346C14.666 45.7529 18.2477 49.3346 22.666 49.3346H41.3327C45.7509 49.3346 49.3327 45.7529 49.3327 41.3346V22.668C49.3327 18.2497 45.7509 14.668 41.3327 14.668Z" fill="#2B7FFF"/><path d="M36 24H28C25.7908 24 24 25.7908 24 28V36C24 38.2092 25.7908 40 28 40H36C38.2092 40 40 38.2092 40 36V28C40 25.7908 38.2092 24 36 24Z" fill="#2B7FFF"/></svg>
+				</div>
+
+				<div class="relative flex flex-wrap items-center justify-center gap-3" data-sc-cut>
+					<div class="tag-pill-left flex items-center gap-[7px] rounded-full py-[5px]" style="padding-left: 10px; padding-right: 10px;">
+						<svg class="size-4 shrink-0" style="color: #99A1AF;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/>
+						</svg>
+						<span class="whitespace-nowrap text-sm text-white">SSO &amp; RBAC</span>
+					</div>
+					<div class="tag-pill-right flex items-center gap-[7px] rounded-full py-[5px]" style="padding-left: 10px; padding-right: 10px;">
+						<svg class="size-4 shrink-0" style="color: #99A1AF;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+							<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+						</svg>
+						<span class="whitespace-nowrap text-sm text-white">AES-256 encryption</span>
+					</div>
+					<div class="tag-pill-left flex items-center gap-[7px] rounded-full py-[5px]" style="padding-left: 10px; padding-right: 10px;">
+						<svg class="size-4 shrink-0" style="color: #99A1AF;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
+							<path d="M14 2v4a2 2 0 0 0 2 2h4M10 9H8m8 4H8m8 4H8"/>
+						</svg>
+						<span class="whitespace-nowrap text-sm text-white">Audit logs</span>
+					</div>
+					<div class="tag-pill-right flex items-center gap-[7px] rounded-full py-[5px]" style="padding-left: 10px; padding-right: 10px;">
+						<svg class="size-4 shrink-0" style="color: #99A1AF;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+							<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/>
+						</svg>
+						<span class="whitespace-nowrap text-sm text-white">US &amp; EU regions</span>
+					</div>
+				</div>
+
+				<div class="relative mt-8 flex items-center gap-3" data-sc-cut>
+					<img src="https://cdn-media.huggingface.co/marketing/pmh-page/soc2.png" alt="SOC 2 Type II" style="height: 32px; opacity: 0.7;" class="brightness-125" />
+					<img src="https://cdn-media.huggingface.co/marketing/pmh-page/gdpr.png" alt="GDPR Compliant" style="height: 32px; opacity: 0.7;" class="brightness-125" />
+				</div>
+			</div>
+		</section>
+
+		<script>
+		function scMobileCut() {
+			var container = document.getElementById('sc-mobile');
+			if (!container) return;
+			container.querySelectorAll('.sc-mobile-cut').forEach(function(el) { el.remove(); });
+			if (container.offsetParent === null) return;
+			var els = container.querySelectorAll('[data-sc-cut]');
+			var cRect = container.getBoundingClientRect();
+			var w = container.clientWidth;
+			var h = container.clientHeight;
+			var originX = (w - 100) * 0.5;
+			var originY = 40;
+			var bgColor = '#030712';
+			var gridDiv = container.querySelector('.sc-grid-fade');
+			els.forEach(function(el) {
+				var r = el.getBoundingClientRect();
+				var elTop = r.top - cRect.top;
+				var elBottom = elTop + r.height;
+				var elLeft = r.left - cRect.left;
+				var elRight = elLeft + r.width;
+				for (var y = originY; y < h; y += 50) {
+					if (y >= elTop - 1 && y <= elBottom + 1) {
+						for (var x = originX % 100; x < w; x += 100) {
+							if (elRight > x && elLeft < x + 100) {
+								var cut = document.createElement('div');
+								cut.className = 'sc-mobile-cut';
+								cut.style.cssText = 'position:absolute;left:' + x + 'px;top:' + (y - 1) + 'px;width:100px;height:3px;background:' + bgColor + ';pointer-events:none;';
+								gridDiv.after(cut);
+							}
+						}
+					}
+				}
+			});
+		}
+		scMobileCut();
+		window.addEventListener('resize', function() { requestAnimationFrame(scMobileCut); });
+		</script>
+
+	</div>
+</body>
+</html>

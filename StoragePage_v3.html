@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Hugging Face Storage Buckets</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script>
+	tailwind.config = {
+		darkMode: 'class',
+		theme: {
+			extend: {
+				fontFamily: {
+					sans: ['"Source Sans Pro"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+					mono: ['"IBM Plex Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+				},
+				colors: {
+					gray: {
+						925: '#111827',
+					}
+				}
+			}
+		}
+	}
+	</script>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+	<style>
+		@keyframes dedup-pulse {
+			0%, 100% { opacity: 0.4; }
+			50% { opacity: 1; }
+		}
+		.dedup-highlight {
+			animation: dedup-pulse 2s ease-in-out infinite;
+		}
+		@keyframes float-y {
+			0%, 100% { transform: translateY(0px); }
+			50% { transform: translateY(-8px); }
+		}
+		.node-float {
+			animation: float-y 3s ease-in-out infinite;
+		}
+	</style>
+</head>
+<body class="bg-white dark:bg-gray-950 min-h-screen">
+	<!-- Navigation bar -->
+	<header class="border-b border-gray-200/50 dark:border-[#141c2e]">
+		<div class="container mx-auto flex h-16 items-center px-4">
+			<div class="flex flex-1 items-center">
+				<a href="/" class="mr-5 flex flex-none items-center lg:mr-6">
+					<img alt="Hugging Face's logo" class="w-7 md:mr-2" src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" />
+					<span class="hidden whitespace-nowrap text-lg font-bold md:block text-black dark:text-white">Hugging Face</span>
+				</a>
+				<div class="relative mr-2 hidden sm:block">
+					<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32" class="absolute left-2.5 text-gray-400 top-1/2 -translate-y-1/2"><path d="M30 28.59L22.45 21A11 11 0 1 0 21 22.45L28.59 30zM5 14a9 9 0 1 1 9 9a9.01 9.01 0 0 1-9-9z" fill="currentColor"></path></svg>
+					<input type="text" placeholder="Search models, datasets, users..." class="h-9 w-64 rounded-lg border border-gray-200 bg-white pl-8 pr-3 text-sm text-gray-900 placeholder-gray-400 dark:border-[#141c2e] dark:bg-gray-950 dark:text-gray-300 dark:placeholder-gray-500" />
+				</div>
+			</div>
+			<nav class="ml-auto hidden lg:block">
+				<ul class="flex items-center gap-x-1 2xl:gap-x-2 text-sm">
+					<li><a href="/models" class="group flex items-center px-2 py-0.5 dark:text-gray-300 dark:hover:text-gray-100"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" class="mr-1.5 text-gray-400 group-hover:text-indigo-500"><path d="M20.23 7.24L12 12L3.77 7.24a1.98 1.98 0 0 1 .7-.71L11 2.76c.62-.35 1.38-.35 2 0l6.53 3.77c.29.173.531.418.7.71z" opacity=".25" fill="currentColor"/><path d="M12 12v9.5a2.09 2.09 0 0 1-.91-.21L4.5 17.48a2.003 2.003 0 0 1-1-1.73v-7.5a2.06 2.06 0 0 1 .27-1.01L12 12z" opacity=".5" fill="currentColor"/><path d="M20.5 8.25v7.5a2.003 2.003 0 0 1-1 1.73l-6.62 3.82c-.275.13-.576.198-.88.2V12l8.23-4.76c.175.308.268.656.27 1.01z" fill="currentColor"/></svg>Models</a></li>
+					<li><a href="/datasets" class="group flex items-center px-2 py-0.5 dark:text-gray-300 dark:hover:text-gray-100"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 25 25" class="mr-1.5 text-gray-400 group-hover:text-red-500"><ellipse cx="12.5" cy="5" fill="currentColor" fill-opacity="0.25" rx="7.5" ry="2"/><path d="M12.5 15C16.6421 15 20 14.1046 20 13V20C20 21.1046 16.6421 22 12.5 22C8.35786 22 5 21.1046 5 20V13C5 14.1046 8.35786 15 12.5 15Z" fill="currentColor" opacity="0.5"/><path d="M12.5 7C16.6421 7 20 6.10457 20 5V11.5C20 12.6046 16.6421 13.5 12.5 13.5C8.35786 13.5 5 12.6046 5 11.5V5C5 6.10457 8.35786 7 12.5 7Z" fill="currentColor" opacity="0.5"/></svg>Datasets</a></li>
+					<li><a href="/spaces" class="group flex items-center px-2 py-0.5 dark:text-gray-300 dark:hover:text-gray-100"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 25 25" class="mr-1.5 text-gray-400 group-hover:text-blue-500"><path opacity=".5" d="M6.016 14.674v4.31h4.31v-4.31h-4.31ZM14.674 14.674v4.31h4.31v-4.31h-4.31ZM6.016 6.016v4.31h4.31v-4.31h-4.31Z" fill="currentColor"/><path opacity=".75" fill-rule="evenodd" clip-rule="evenodd" d="M3 4.914C3 3.857 3.857 3 4.914 3h6.514c.884 0 1.628.6 1.848 1.414a5.171 5.171 0 0 1 7.31 7.31c.815.22 1.414.964 1.414 1.848v6.514A1.914 1.914 0 0 1 20.086 22H4.914A1.914 1.914 0 0 1 3 20.086V4.914Zm3.016 1.102v4.31h4.31v-4.31h-4.31Zm0 12.968v-4.31h4.31v4.31h-4.31Zm8.658 0v-4.31h4.31v4.31h-4.31Zm0-10.813a2.155 2.155 0 1 1 4.31 0 2.155 2.155 0 0 1-4.31 0Z" fill="currentColor"/><path opacity=".25" d="M16.829 6.016a2.155 2.155 0 1 0 0 4.31 2.155 2.155 0 0 0 0-4.31Z" fill="currentColor"/></svg>Spaces</a></li>
+					<li><a href="/storage" class="group flex items-center px-2 py-0.5 dark:text-gray-300 dark:hover:text-gray-100"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 48 48" fill="none" class="mr-1.5 text-blue-600 dark:text-blue-500"><path opacity="0.25" d="M36 4H12C7.58172 4 4 7.58172 4 12V36C4 40.4183 7.58172 44 12 44H36C40.4183 44 44 40.4183 44 36V12C44 7.58172 40.4183 4 36 4Z" fill="currentColor"/><path opacity="0.5" d="M31 11H17C13.6863 11 11 13.6863 11 17V31C11 34.3137 13.6863 37 17 37H31C34.3137 37 37 34.3137 37 31V17C37 13.6863 34.3137 11 31 11Z" fill="currentColor"/><path d="M27 18H21C19.3431 18 18 19.3431 18 21V27C18 28.6569 19.3431 30 21 30H27C28.6569 30 30 28.6569 30 27V21C30 19.3431 28.6569 18 27 18Z" fill="currentColor"/></svg>Buckets <span class="ml-1 rounded bg-green-100 px-1.5 py-0.5 text-[10px] font-bold uppercase text-green-700 dark:bg-green-900/30 dark:text-green-400">new</span></a></li>
+					<li><a href="/docs" class="group flex items-center px-2 py-0.5 dark:text-gray-300 dark:hover:text-gray-100"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16" class="mr-1.5 text-gray-400 group-hover:text-yellow-500"><path d="m2.28 3.7-.3.16a.67.67 0 0 0-.34.58v8.73l.01.04.02.07.01.04.03.06.02.04.02.03.04.06.05.05.04.04.06.04.06.04.08.04.08.02h.05l.07.02h.11l.04-.01.07-.02.03-.01.07-.03.22-.12a5.33 5.33 0 0 1 5.15.1.67.67 0 0 0 .66 0 5.33 5.33 0 0 1 5.33 0 .67.67 0 0 0 1-.58V4.36a.67.67 0 0 0-.34-.5l-.3-.17v7.78a.63.63 0 0 1-.87.59 4.9 4.9 0 0 0-4.35.35l-.65.39a.29.29 0 0 1-.15.04.29.29 0 0 1-.16-.04l-.65-.4a4.9 4.9 0 0 0-4.34-.34.63.63 0 0 1-.87-.59V3.7Z" fill="currentColor" class="dark:opacity-40"/><path fill-rule="evenodd" clip-rule="evenodd" d="M8 3.1a5.99 5.99 0 0 0-5.3-.43.66.66 0 0 0-.42.62v8.18c0 .45.46.76.87.59a4.9 4.9 0 0 1 4.34.35l.65.39c.05.03.1.04.16.04.05 0 .1-.01.15-.04l.65-.4a4.9 4.9 0 0 1 4.35-.34c.4.17.87-.14.87-.59V3.3a.66.66 0 0 0-.42-.63 5.99 5.99 0 0 0-5.3.43l-.3.18-.3-.18Z" fill="currentColor"/></svg>Docs</a></li>
+					<li><a href="/enterprise" class="group flex items-center px-2 py-0.5 dark:text-gray-300 dark:hover:text-gray-100"><svg xmlns="http://www.w3.org/2000/svg" fill="none" width="1em" height="1em" viewBox="0 0 12 12" class="mr-1.5 text-gray-400 group-hover:text-black dark:group-hover:text-white"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.9 1.35a3.16 3.16 0 0 0-2.8 2.07L.37 8.58C0 9.71.7 10.65 1.86 10.65H7.3a3.2 3.2 0 0 0 2.84-2.07l1.67-5.16c.36-1.13-.3-2.07-1.46-2.07H4.91Zm.4 2.07L3.57 8.47h3.57l.36-1.12H5.4l.28-.91h1.75l.4-1.1H6.07l.3-.83h2l.36-1.1H5.27h.04Z" fill="currentColor"/></svg>Enterprise</a></li>
+					<li><a href="/pricing" class="flex items-center px-2 py-0.5 dark:text-gray-300 dark:hover:text-gray-100">Pricing</a></li>
+					<li class="ml-2 border-l border-gray-200 pl-2 dark:border-[#141c2e]"><a href="/login" class="px-2 py-0.5 dark:text-gray-300 dark:hover:text-gray-100">Log In</a></li>
+					<li><a href="/join" class="rounded-full bg-white px-3 py-1 font-semibold text-gray-900 dark:bg-gray-100 dark:text-black">Sign Up</a></li>
+				</ul>
+			</nav>
+		</div>
+	</header>
+
+	<div class="w-full">
+
+		<!-- ============================================ -->
+		<!-- SECTION 1: HERO                              -->
+		<!-- ============================================ -->
+		<section id="hero-section"
+			class="relative mx-auto flex max-w-7xl flex-col items-center text-balance border-l border-r border-b border-gray-200/50 dark:border-[#141c2e] px-4 pb-16 pt-8 text-center sm:px-6 sm:pt-12 lg:px-8"
+		>
+			<div class="absolute inset-0 bg-[url('https://cdn-uploads.huggingface.co/production/uploads/5f17f0a0925b9863e28ad517/7yYe9E-d38GWl6bnEUhhG.png')] bg-cover bg-center bg-no-repeat opacity-30 dark:opacity-15"></div>
+			<svg id="bucket-svg" class="absolute inset-0 pointer-events-none" width="100%" height="100%" overflow="visible" xmlns="http://www.w3.org/2000/svg">
+				<defs id="bucket-defs"></defs>
+				<g id="bucket-lines"></g>
+				<g id="anim-blue-lines"></g>
+				<g id="anim-dot-ripples"></g>
+			</svg>
+			<div id="hero-floor" class="relative px-4 py-6 text-center sm:px-6 sm:py-8 lg:px-8 lg:py-10">
+			<!-- Dotted background with radial fade toward center -->
+			<div id="hero-dots" class="pointer-events-none absolute -inset-px" style="background-image: radial-gradient(circle, rgba(255,255,255,0.22) 0.5px, transparent 0.5px); background-size: 8px 8px; -webkit-mask-image: radial-gradient(ellipse at center, transparent 10%, rgba(0,0,0,0.6) 45%, black 100%); mask-image: radial-gradient(ellipse at center, transparent 10%, rgba(0,0,0,0.6) 45%, black 100%);"></div>
+			<h1 id="hero-title"
+				class="relative mb-4 text-pretty text-5xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl md:text-7xl"
+			>
+				Hugging Face
+				<span class="relative inline-block">
+					<span
+						class="bg-gradient-to-br relative from-blue-500 from-15% via-blue-500 to-sky-500 bg-clip-text font-bold text-transparent"
+						style="font-weight: 700;"
+					>
+						Storage Buckets
+					</span>
+					<span
+						class="bg-gradient-to-br absolute left-0 from-blue-500 from-15% via-blue-500 to-sky-500 bg-clip-text font-bold text-transparent opacity-25 blur-xl"
+						style="font-weight: 700;"
+					>
+						Storage Buckets
+					</span>
+				</span>
+			</h1>
+			<p class="relative mb-6 text-gray-600 dark:text-gray-400 xl:mb-12" style="font-size: 24px;">
+				AI-native object storage designed for scale, speed, and team workflows.
+			</p>
+			<div class="mx-auto flex w-full flex-col items-center justify-center gap-1.5 sm:gap-3 md:flex-row">
+				<a
+					href="/new-bucket"
+					class="ring-offset-[3px] relative z-[1] flex w-fit items-center gap-[10px] whitespace-nowrap rounded-full bg-black px-5 py-2 text-white ring-1 ring-gray-300 transition-all hover:ring-black dark:bg-gray-100 dark:text-black dark:ring-gray-100 dark:ring-offset-gray-950 sm:text-lg"
+				><span>&rarr;</span><span>Create a Bucket</span></a>
+				<span class="text-gray-500">or</span>
+				<a
+					href="/settings/billing?add-storage=true"
+					class="ring-offset-[3px] relative z-[1]flex w-fit items-center gap-1.5 whitespace-nowrap rounded-full bg-gray-200 px-5 py-2 text-base text-gray-900 ring-1 ring-gray-300 transition-all hover:ring-gray-500 dark:bg-gray-600 dark:text-gray-300 dark:ring-gray-600 dark:ring-offset-gray-950 sm:text-lg"
+				>Get a Storage package</a>
+			</div>
+			</div>
+		</section>
+
+		<!-- Spacer -->
+		<section class="w-full border-b border-gray-200/50 dark:border-[#141c2e] px-4"><div class="mx-auto h-16 max-w-7xl border-l border-r border-gray-200/50 dark:border-[#141c2e]"></div></section>
+
+		<!-- ============================================ -->
+		<!-- SECTION 2: OBJECT STORAGE TERMINAL            -->
+		<!-- ============================================ -->
+		<section class="w-full border-b border-gray-200/50 dark:border-[#141c2e] px-4"><div class="w-full"><article
+			class="mx-auto max-w-7xl grid overflow-hidden border-l border-r border-gray-200/50 dark:border-[#141c2e] bg-white dark:bg-gray-950 lg:grid-cols-2"
+		>
+			<div class="p-8 sm:p-10 lg:p-14">
+				<span
+					class="text-sm mb-4 inline-block rounded-full bg-blue-100 dark:bg-blue-900/30 px-4 py-1 font-semibold text-blue-700 dark:text-blue-300"
+				>
+					Storage
+				</span>
+				<h2 class="mb-6 text-balance text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">
+					Storage built for AI teams
+				</h2>
+				<p class="mb-8 text-lg text-gray-600 dark:text-gray-400">
+					Store models, datasets, and artifacts with simple per-TB pricing. Xet deduplication. Included CDN. No git
+					overhead.
+				</p>
+				<div class="space-y-4">
+					<div class="flex items-center gap-3">
+						<div class="flex size-5 shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50">
+							<svg class="size-3 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+							</svg>
+						</div>
+						<p class="text-sm text-gray-700 dark:text-gray-300 sm:text-base">
+							Per-TB pricing with built-in CDN and deduplication speedups.
+						</p>
+					</div>
+					<div class="flex items-center gap-3">
+						<div class="flex size-5 shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50">
+							<svg class="size-3 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+							</svg>
+						</div>
+						<p class="text-sm text-gray-700 dark:text-gray-300 sm:text-base">
+							No Git constraints: commit-free sync and fast object updates.
+						</p>
+					</div>
+					<div class="flex items-center gap-3">
+						<div class="flex size-5 shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50">
+							<svg class="size-3 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+							</svg>
+						</div>
+						<p class="text-sm text-gray-700 dark:text-gray-300 sm:text-base">
+							Designed for ML workflows: datasets, checkpoints, model artifacts.
+						</p>
+					</div>
+				</div>
+			</div>
+			<div
+				class="bg-gradient-to-br relative flex items-center justify-center overflow-hidden from-sky-50 to-blue-50 dark:from-blue-950/20 dark:to-sky-950/20 p-8 max-lg:order-2 lg:p-12"
+			>
+				<div class="w-full max-w-xl">
+					<div class="shadow-xs overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/50">
+						<div class="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/60 px-4 py-2.5">
+							<span class="h-3 w-3 rounded-full bg-red-400"></span>
+							<span class="h-3 w-3 rounded-full bg-yellow-400"></span>
+							<span class="h-3 w-3 rounded-full bg-green-400"></span>
+							<span class="flex-1 text-center font-mono text-xs text-gray-500 dark:text-gray-400">terminal - bash</span>
+						</div>
+						<div class="overflow-x-auto p-4 font-mono text-[11px] leading-relaxed text-gray-700 dark:text-gray-200 sm:p-6 sm:text-[12px]">
+							<div class="mb-1 text-gray-500 dark:text-gray-400"># Create a storage bucket</div>
+							<div class="mb-3">
+								<span class="text-green-600 dark:text-green-300">$</span>
+								<span class="text-gray-900 dark:text-white"> hf buckets create</span>
+								<span class="text-cyan-600 dark:text-cyan-300"> acme-corp/training-data</span>
+							</div>
+							<div class="mb-1 pl-0 text-gray-500 dark:text-gray-400">
+								<span class="text-green-600 dark:text-green-300">&#10003;</span> Bucket created:
+								<span class="text-cyan-700 dark:text-cyan-200"> hf://buckets/acme-corp/training-data</span>
+							</div>
+							<div class="mb-4 pl-0 text-gray-500 dark:text-gray-400">
+								<span class="text-green-600 dark:text-green-300">&#10003;</span> Visibility:
+								<span class="text-gray-900 dark:text-white">private</span> &middot; Region:
+								<span class="text-gray-900 dark:text-white">us-east-1</span>
+							</div>
+							<div class="mb-1 text-gray-500 dark:text-gray-400"># Sync training data to the bucket</div>
+							<div class="mb-3">
+								<span class="text-green-600 dark:text-green-300">$</span>
+								<span class="text-gray-900 dark:text-white"> hf sync</span>
+								<span class="text-yellow-600"> ./checkpoints/</span>
+								<span class="text-cyan-600 dark:text-cyan-300"> hf://buckets/acme-corp/training-data</span>
+							</div>
+							<div class="mb-0.5 text-gray-500 dark:text-gray-400">
+								Scanning local files...
+								<span class="text-gray-900 dark:text-white">12,847 files</span> (<span class="text-gray-900 dark:text-white">2.4 TB</span>)
+							</div>
+							<div class="mb-0.5 text-gray-500 dark:text-gray-400">
+								Xet dedup:
+								<span class="text-green-600 dark:text-green-300">62% deduplicated</span> : uploading
+								<span class="text-gray-900 dark:text-white">912 GB</span> (saved 1.5 TB)
+							</div>
+							<div class="mb-1">
+								<span class="text-green-600 dark:text-green-300">&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;</span><span class="text-gray-300 dark:text-gray-600">&#9608;&#9608;&#9608;&#9608;&#9608;</span>
+								<span class="text-gray-900 dark:text-white"> 78%</span>
+								<span class="text-gray-500 dark:text-gray-400"> 714/912 GB &middot; 2.1 GB/s &middot; ETA 1m 34s</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</article></div></section>
+
+		<!-- ============================================ -->
+		<!-- SECTION 3: Xet Dedup Deep-Dive              -->
+		<!-- ============================================ -->
+		<section class="w-full border-b border-gray-200/50 dark:border-[#141c2e] px-4"><div class="w-full"><article
+			class="mx-auto max-w-7xl relative z-10 grid overflow-hidden border-l border-r border-gray-200/50 dark:border-[#141c2e] bg-white dark:bg-gray-950 lg:grid-cols-2"
+		>
+			<div class="p-8 sm:p-10 lg:p-14 max-lg:order-1 lg:order-2 lg:border-l lg:border-gray-200/50 dark:lg:border-[#141c2e]">
+				<span
+					class="text-sm mb-4 inline-block rounded-full bg-pink-100 dark:bg-pink-900/30 px-4 py-1 font-semibold text-pink-700 dark:text-pink-300"
+				>
+					Xet Technology
+				</span>
+				<h2 class="mb-6 text-balance text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">
+					Next-gen large-scale storage for AI
+				</h2>
+				<p class="mb-8 text-lg text-gray-600 dark:text-gray-400">
+					Xet uses content-defined chunking to break files into byte-level chunks and deduplicates across your entire
+					bucket. When you retrain a model and only 5% of weights change, only that 5% is re-uploaded.
+				</p>
+
+				<!-- Benefits list -->
+				<div class="space-y-4">
+					<div class="flex items-center gap-3">
+						<div class="flex size-5 shrink-0 items-center justify-center rounded-full bg-pink-100 dark:bg-pink-900/50">
+							<svg class="size-3 text-pink-600 dark:text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+							</svg>
+						</div>
+						<p class="text-sm text-gray-700 dark:text-gray-300 sm:text-base">
+							Raw + processed dataset: stored once, billed once*
+						</p>
+					</div>
+					<div class="flex items-center gap-3">
+						<div class="flex size-5 shrink-0 items-center justify-center rounded-full bg-pink-100 dark:bg-pink-900/50">
+							<svg class="size-3 text-pink-600 dark:text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+							</svg>
+						</div>
+						<p class="text-sm text-gray-700 dark:text-gray-300 sm:text-base">
+							4x less data per upload, verified with real-world workloads
+						</p>
+					</div>
+				</div>
+				<p class="mt-4 text-xs text-gray-400">
+					*Requires <a href="/enterprise" class="underline underline-offset-2 hover:text-gray-600 dark:hover:text-gray-300">Enterprise or Enterprise Plus</a> plan
+				</p>
+			</div>
+
+			<!-- Dedup visual (right column) -->
+			<div
+				class="bg-gradient-to-br relative flex items-center justify-center overflow-hidden from-pink-50 to-purple-50 dark:from-pink-950/20 dark:to-purple-950/20 p-8 max-lg:order-2 max-lg:pb-16 lg:p-12"
+			>
+				<div class="w-full max-w-md space-y-4">
+					<!-- Traditional upload -->
+					<div class="shadow-xs rounded-xl bg-white dark:bg-gray-900 p-5">
+						<p class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+							Traditional S3 Upload
+						</p>
+						<div class="mb-2 flex gap-1">
+							<div class="h-6 flex-1 rounded bg-amber-200 dark:bg-amber-900/35"></div>
+							<div class="h-6 flex-1 rounded bg-amber-200 dark:bg-amber-900/35"></div>
+							<div class="h-6 flex-1 rounded bg-amber-200 dark:bg-amber-900/35"></div>
+							<div class="h-6 flex-1 rounded bg-amber-300 dark:bg-amber-900/35"></div>
+							<div class="h-6 flex-1 rounded bg-amber-200 dark:bg-amber-900/35"></div>
+							<div class="h-6 flex-1 rounded bg-amber-200 dark:bg-amber-900/35"></div>
+							<div class="h-6 flex-1 rounded bg-amber-200 dark:bg-amber-900/35"></div>
+							<div class="h-6 flex-1 rounded bg-amber-200 dark:bg-amber-900/35"></div>
+						</div>
+						<p class="text-right font-mono text-sm text-amber-600">8 / 8 chunks uploaded</p>
+					</div>
+
+					<!-- Separator -->
+					<div class="flex items-center justify-center text-sm font-medium text-gray-400">VS</div>
+
+					<!-- Xet upload -->
+					<div class="shadow-xs rounded-xl border-2 border-indigo-200 dark:border-indigo-500/20 bg-white dark:bg-gray-900 p-5">
+						<p class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+							<span
+								class="bg-gradient-to-br mr-2 inline-block rounded-md from-indigo-100 to-purple-100 px-2 py-0.5 text-xs font-bold uppercase text-indigo-700"
+							>XET</span>
+							Deduplicated Upload
+						</p>
+						<div class="mb-2 flex gap-1">
+							<div class="h-6 flex-1 rounded bg-gray-100 dark:bg-gray-700"></div>
+							<div class="h-6 flex-1 rounded bg-gray-100 dark:bg-gray-700"></div>
+							<div class="h-6 flex-1 rounded bg-gray-100 dark:bg-gray-700"></div>
+							<div class="dedup-highlight h-6 flex-1 rounded bg-indigo-400 dark:bg-indigo-500"></div>
+							<div class="h-6 flex-1 rounded bg-gray-100 dark:bg-gray-700"></div>
+							<div class="h-6 flex-1 rounded bg-gray-100 dark:bg-gray-700"></div>
+							<div class="h-6 flex-1 rounded bg-gray-100 dark:bg-gray-700"></div>
+							<div class="h-6 flex-1 rounded bg-gray-100 dark:bg-gray-700"></div>
+						</div>
+						<p class="text-right font-mono text-sm font-medium text-indigo-600">
+							1 / 8 chunks uploaded
+						</p>
+					</div>
+
+					<!-- Annotation -->
+					<p class="text-center text-sm text-gray-500 dark:text-gray-400">
+						Gray = already stored &middot; Purple = only the changed chunk
+					</p>
+				</div>
+			</div>
+		</article></div></section>
+
+		<!-- ===================== PRICING ===================== -->
+		<section class="w-full border-b border-gray-200/50 dark:border-[#141c2e] px-4"><div class="w-full"><article
+			class="mx-auto max-w-7xl grid overflow-hidden border-l border-r border-gray-200/50 dark:border-[#141c2e] bg-white dark:bg-gray-950 lg:grid-cols-2"
+		>
+			<div class="p-8 sm:p-10 lg:p-14">
+				<span
+					class="text-sm mb-4 inline-block rounded-full bg-sky-100 dark:bg-sky-900/30 px-4 py-1 font-semibold text-sky-700 dark:text-sky-300"
+				>
+					Pricing
+				</span>
+				<h2 class="mb-6 text-balance text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">
+					Transparent, volume-based pricing
+				</h2>
+				<p class="mb-8 text-lg text-gray-600 dark:text-gray-400">
+					Simple per-TB pricing that scales with usage. Egress and CDN are included at no extra cost.
+				</p>
+
+				<!-- Comparison bars -->
+				<div class="space-y-2">
+					<!-- AWS S3 -->
+					<div class="flex items-center gap-4">
+						<div class="w-32 shrink-0 text-sm text-gray-600 dark:text-gray-400">AWS S3</div>
+						<div class="relative h-2.5 flex-1 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700">
+							<div
+								class="absolute inset-y-0 left-0 rounded-full bg-gray-300 dark:bg-gray-600"
+								style="width: 100%"
+							></div>
+						</div>
+						<div class="w-12 shrink-0 text-right text-sm font-semibold text-gray-500 dark:text-gray-400">$23</div>
+					</div>
+					<!-- Backblaze Overdrive -->
+					<div class="flex items-center gap-4">
+						<div class="w-32 shrink-0 text-sm text-gray-600 dark:text-gray-400">Backblaze Overdrive</div>
+						<div class="relative h-2.5 flex-1 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700">
+							<div
+								class="absolute inset-y-0 left-0 rounded-full bg-gray-300 dark:bg-gray-600"
+								style="width: 65.2%"
+							></div>
+						</div>
+						<div class="w-12 shrink-0 text-right text-sm font-semibold text-gray-500 dark:text-gray-400">$15</div>
+					</div>
+
+					<!-- HF Hub -->
+					<div class="flex items-center gap-4">
+						<div class="w-32 shrink-0 text-sm font-medium text-blue-600 dark:text-blue-400">HF Hub</div>
+						<div class="relative h-2.5 flex-1 overflow-hidden rounded-full bg-blue-100 dark:bg-gray-700">
+							<div
+								class="absolute inset-y-0 left-0 rounded-full bg-blue-200/50"
+								style="width: 52.2%"
+							></div>
+							<div
+								class="bg-gradient-to-r absolute inset-y-0 left-0 rounded-full from-blue-500 to-blue-400"
+								style="width: 34.8%"
+							></div>
+						</div>
+						<div class="w-12 shrink-0 text-right text-sm font-bold text-blue-600 dark:text-blue-400">
+							$8&ndash;12
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Pricing tiers (right column) -->
+			<div
+				class="bg-gradient-to-br flex items-center justify-center from-sky-50 to-cyan-50 dark:from-sky-950/20 dark:to-cyan-950/20 p-8 max-lg:order-2 lg:p-12"
+			>
+				<div class="grid w-full max-w-lg grid-cols-2 gap-3">
+					<!-- Base tier -->
+					<div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3">
+						<div class="mb-2 flex items-center gap-2">
+							<span class="text-sm font-medium text-gray-500 dark:text-gray-400">Base</span>
+						</div>
+						<div class="mb-0.5 flex items-baseline gap-1">
+							<span class="text-2xl font-bold text-gray-900 dark:text-white">$12</span>
+							<span class="text-sm text-gray-500 dark:text-gray-400">/TB/mo</span>
+						</div>
+						<div class="text-xs text-gray-400">Public repositories</div>
+						<div class="mt-3 border-t border-gray-200/50 dark:border-[#141c2e] dark:border-gray-800 pt-2">
+							<div class="flex items-baseline gap-1">
+								<span class="text-base font-semibold text-gray-700 dark:text-white">$18</span>
+								<span class="text-sm text-gray-400">/TB/mo</span>
+							</div>
+							<div class="text-xs text-gray-400">Private repositories</div>
+						</div>
+					</div>
+					<!-- 50TB+ tier -->
+					<div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3">
+						<div class="mb-2 flex items-center gap-2">
+							<span class="text-sm font-medium text-gray-500 dark:text-gray-400">50TB+</span>
+							<span class="rounded-full px-2 py-0.5 text-xs font-semibold bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400">20% off</span>
+						</div>
+						<div class="mb-0.5 flex items-baseline gap-1">
+							<span class="text-2xl font-bold text-gray-900 dark:text-white">$10</span>
+							<span class="text-sm text-gray-500 dark:text-gray-400">/TB/mo</span>
+						</div>
+						<div class="text-xs text-gray-400">Public repositories</div>
+						<div class="mt-3 border-t border-gray-200/50 dark:border-[#141c2e] dark:border-gray-800 pt-2">
+							<div class="flex items-baseline gap-1">
+								<span class="text-base font-semibold text-gray-700 dark:text-white">$16</span>
+								<span class="text-sm text-gray-400">/TB/mo</span>
+							</div>
+							<div class="text-xs text-gray-400">Private repositories</div>
+						</div>
+					</div>
+					<!-- 200TB+ tier -->
+					<div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3">
+						<div class="mb-2 flex items-center gap-2">
+							<span class="text-sm font-medium text-gray-500 dark:text-gray-400">200TB+</span>
+							<span class="rounded-full px-2 py-0.5 text-xs font-semibold bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400">25% off</span>
+						</div>
+						<div class="mb-0.5 flex items-baseline gap-1">
+							<span class="text-2xl font-bold text-gray-900 dark:text-white">$9</span>
+							<span class="text-sm text-gray-500 dark:text-gray-400">/TB/mo</span>
+						</div>
+						<div class="text-xs text-gray-400">Public repositories</div>
+						<div class="mt-3 border-t border-gray-200/50 dark:border-[#141c2e] dark:border-gray-800 pt-2">
+							<div class="flex items-baseline gap-1">
+								<span class="text-base font-semibold text-gray-700 dark:text-white">$14</span>
+								<span class="text-sm text-gray-400">/TB/mo</span>
+							</div>
+							<div class="text-xs text-gray-400">Private repositories</div>
+						</div>
+					</div>
+					<!-- 500TB+ tier -->
+					<div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3">
+						<div class="mb-2 flex items-center gap-2">
+							<span class="text-sm font-medium text-gray-500 dark:text-gray-400">500TB+</span>
+							<span class="rounded-full px-2 py-0.5 text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400">33% off</span>
+						</div>
+						<div class="mb-0.5 flex items-baseline gap-1">
+							<span class="text-2xl font-bold text-gray-900 dark:text-white">$8</span>
+							<span class="text-sm text-gray-500 dark:text-gray-400">/TB/mo</span>
+						</div>
+						<div class="text-xs text-gray-400">Public repositories</div>
+						<div class="mt-3 border-t border-gray-200/50 dark:border-[#141c2e] dark:border-gray-800 pt-2">
+							<div class="flex items-baseline gap-1">
+								<span class="text-base font-semibold text-gray-700 dark:text-white">$12</span>
+								<span class="text-sm text-gray-400">/TB/mo</span>
+							</div>
+							<div class="text-xs text-gray-400">Private repositories</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</article></div></section>
+
+		<!-- ============================================================ -->
+		<!-- USE CASE 1: Training Data (text left, visual right)          -->
+		<!-- ============================================================ -->
+		<section class="w-full border-b border-gray-200/50 dark:border-[#141c2e] px-4"><div class="w-full"><article
+			class="mx-auto max-w-7xl grid overflow-hidden border-l border-r border-gray-200/50 dark:border-[#141c2e] bg-white dark:bg-gray-950 lg:grid-cols-2"
+		>
+			<div class="p-8 sm:p-10 lg:p-14 max-lg:order-1 lg:order-2 lg:border-l lg:border-gray-200/50 dark:lg:border-[#141c2e]">
+				<span
+					class="text-sm mb-4 inline-block rounded-full bg-amber-100 dark:bg-amber-900/30 px-4 py-1 font-semibold text-amber-700 dark:text-amber-300"
+				>
+					Data Storage
+				</span>
+				<h2 class="mb-6 text-balance text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">
+					Assemble training data at any scale
+				</h2>
+				<p class="text-lg text-gray-600 dark:text-gray-400">
+					Pour raw data from every source into a single bucket: crawls, annotations, synthetic outputs, partner
+					datasets. No git overhead, no commit queues, no file-count limits. When training begins, your data is
+					already there, streamed to GPUs via the included CDN.
+				</p>
+				<ul class="mt-6 space-y-3 text-gray-600 dark:text-gray-300">
+					<li class="flex items-center gap-3">
+						<span class="flex size-5 flex-none items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400">
+							<svg class="size-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+							</svg>
+						</span>
+						<p class="text-sm sm:text-base">Immediate availability on upload, no queued commits</p>
+					</li>
+					<li class="flex items-center gap-3">
+						<span class="flex size-5 flex-none items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400">
+							<svg class="size-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+							</svg>
+						</span>
+						<p class="text-sm sm:text-base">Batch API processes thousands of files in a single call</p>
+					</li>
+					<li class="flex items-center gap-3">
+						<span class="flex size-5 flex-none items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400">
+							<svg class="size-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+							</svg>
+						</span>
+						<p class="text-sm sm:text-base">Raw + processed datasets with dedup = no double billing*</p>
+					</li>
+				</ul>
+				<p class="mt-4 text-xs text-gray-400">
+					*Requires <a href="/enterprise" class="underline underline-offset-2 hover:text-gray-600 dark:hover:text-gray-300">Enterprise or Enterprise Plus</a> plan
+				</p>
+			</div>
+			<!-- Visual: Bucket filling diagram -->
+			<div
+				class="bg-gradient-to-br relative flex items-center justify-center from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 p-8 max-lg:order-2 lg:p-12"
+			>
+				<div class="w-full max-w-lg space-y-3">
+					<!-- Simulated files flowing in -->
+					<div class="rounded-lg border border-amber-200/60 dark:border-amber-800/20 bg-white/80 dark:bg-gray-900/80 px-4 py-3">
+						<div class="flex items-center gap-3">
+							<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400">
+								<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+								</svg>
+							</div>
+							<div class="min-w-0 flex-1">
+								<p class="truncate text-sm font-medium text-gray-900 dark:text-white">crawl-2026-jan/</p>
+								<p class="text-xs text-gray-500 dark:text-gray-400">48 TB &middot; 2.1M files</p>
+							</div>
+							<span class="rounded-full bg-green-100 dark:bg-green-900/30 px-2 py-0.5 text-xs font-medium text-green-700 dark:text-green-400">synced</span>
+						</div>
+					</div>
+					<div class="rounded-lg border border-amber-200/60 dark:border-amber-800/20 bg-white/80 dark:bg-gray-900/80 px-4 py-3">
+						<div class="flex items-center gap-3">
+							<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400">
+								<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+								</svg>
+							</div>
+							<div class="min-w-0 flex-1">
+								<p class="truncate text-sm font-medium text-gray-900 dark:text-white">annotations-v3/</p>
+								<p class="text-xs text-gray-500 dark:text-gray-400">12 TB &middot; 890K files</p>
+							</div>
+							<span class="rounded-full bg-green-100 dark:bg-green-900/30 px-2 py-0.5 text-xs font-medium text-green-700 dark:text-green-400">synced</span>
+						</div>
+					</div>
+					<div class="rounded-lg border border-amber-200/60 dark:border-amber-800/20 bg-white/80 dark:bg-gray-900/80 px-4 py-3">
+						<div class="flex items-center gap-3">
+							<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400">
+								<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+								</svg>
+							</div>
+							<div class="min-w-0 flex-1">
+								<p class="truncate text-sm font-medium text-gray-900 dark:text-white">synthetic-pairs/</p>
+								<p class="text-xs text-gray-500 dark:text-gray-400">6 TB &middot; 340K files</p>
+							</div>
+							<div class="flex items-center gap-2">
+								<div class="h-1.5 w-16 rounded-full bg-gray-200 dark:bg-gray-700">
+									<div class="h-full w-3/4 rounded-full bg-blue-500"></div>
+								</div>
+								<span class="text-xs font-medium text-blue-600 dark:text-blue-400">75%</span>
+							</div>
+						</div>
+					</div>
+					<!-- Dedup savings callout -->
+					<div class="bg-green-50/80 dark:bg-green-950/30 mt-4 rounded-xl border border-dashed border-green-300 dark:border-green-800 px-4 py-3">
+						<div class="flex items-center gap-2">
+							<svg class="h-4 w-4 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+							</svg>
+							<p class="text-sm font-medium text-green-700 dark:text-green-400">
+								Xet dedup: 66 TB stored &rarr; billed for 41 TB*
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</article></div></section>
+
+		<!-- ============================================================ -->
+		<!-- USE CASE 4: CDN & Pre-warming                                -->
+		<!-- ============================================================ -->
+		<section class="w-full border-b border-gray-200/50 dark:border-[#141c2e] px-4"><div class="w-full"><article
+			class="mx-auto max-w-7xl grid overflow-hidden border-l border-r border-gray-200/50 dark:border-[#141c2e] bg-white dark:bg-gray-950 lg:grid-cols-2"
+		>
+			<div class="p-8 sm:p-10 lg:p-14">
+				<span
+					class="text-sm mb-4 inline-block rounded-full bg-teal-100 dark:bg-teal-900/30 px-4 py-1 font-semibold text-teal-700 dark:text-teal-300"
+				>
+					CDN
+				</span>
+				<h2 class="mb-6 text-balance text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">
+					Built-in CDN for blazing fast access
+				</h2>
+				<p class="text-lg text-gray-600 dark:text-gray-400">
+					Every bucket includes a CDN. Warm localized cache close to where you compute for ultra fast streaming and
+					downloads. Egress is included up to a generous 8:1 ratio of your total storage.
+				</p>
+				<ul class="mt-6 space-y-3 text-gray-600 dark:text-gray-300">
+					<li class="flex items-center gap-3">
+						<span class="flex size-5 flex-none items-center justify-center rounded-full bg-teal-100 dark:bg-teal-900/40 text-teal-600 dark:text-teal-400">
+							<svg class="size-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+							</svg>
+						</span>
+						<p class="text-sm sm:text-base">Pre-warm cache in any cloud region you need</p>
+					</li>
+					<li class="flex items-center gap-3">
+						<span class="flex size-5 flex-none items-center justify-center rounded-full bg-teal-100 dark:bg-teal-900/40 text-teal-600 dark:text-teal-400">
+							<svg class="size-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+							</svg>
+						</span>
+						<p class="text-sm sm:text-base">Our CDN is deployed inside GCP and AWS networks</p>
+					</li>
+					<li class="flex items-center gap-3">
+						<span class="flex size-5 flex-none items-center justify-center rounded-full bg-teal-100 dark:bg-teal-900/40 text-teal-600 dark:text-teal-400">
+							<svg class="size-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+							</svg>
+						</span>
+						<p class="text-sm sm:text-base">Egress included up to 8:1 your storage</p>
+					</li>
+				</ul>
+				<div class="mt-6 flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+					<i class="fa-brands fa-google text-3xl"></i>
+					<i class="fa-brands fa-aws text-3xl"></i>
+					<span class="text-sm">More providers coming soon</span>
+				</div>
+			</div>
+			<div
+				class="bg-gradient-to-br relative flex items-center justify-center from-teal-50 to-emerald-50 dark:from-teal-950/20 dark:to-emerald-950/20 p-8 max-lg:order-2 lg:p-12"
+			>
+				<div class="flex items-center justify-center">
+					<svg
+						viewBox="0 0 400 400"
+						class="sm:size-92 size-72 drop-shadow-xl"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+					>
+						<defs>
+							<radialGradient id="globe-shading" cx="30%" cy="30%" r="70%">
+								<stop offset="0%" stop-color="#fff" stop-opacity="0.08" />
+								<stop offset="35%" stop-color="#fff" stop-opacity="0" />
+								<stop offset="70%" stop-color="#000" stop-opacity="0.15" />
+								<stop offset="100%" stop-color="#000" stop-opacity="0.4" />
+							</radialGradient>
+							<filter id="glow-intense" x="-50%" y="-50%" width="200%" height="200%">
+								<feGaussianBlur stdDeviation="4" result="blur" />
+								<feComposite in="SourceGraphic" in2="blur" operator="over" />
+							</filter>
+							<filter id="glow-soft" x="-30%" y="-30%" width="160%" height="160%">
+								<feGaussianBlur stdDeviation="15" result="blur" />
+								<feComposite in="SourceGraphic" in2="blur" operator="over" />
+							</filter>
+						</defs>
+
+						<!-- Outer Atmospheric Glow -->
+						<circle cx="200" cy="200" r="160" fill="currentColor" class="text-teal-400/20" filter="url(#glow-soft)" />
+
+						<!-- Orbit Ring 1 (Back Half) -->
+						<g transform="rotate(-15 200 200)">
+							<path d="M 10 200 A 190 60 0 0 1 390 200" stroke="currentColor" class="text-teal-400/30" stroke-width="1.5" />
+						</g>
+						<g transform="rotate(45 200 200)" />
+
+						<!-- Solid Base Sphere -->
+						<circle cx="200" cy="200" r="150" fill="currentColor" class="text-teal-50 dark:text-[#061926]" />
+
+						<!-- Back Graticules -->
+						<g stroke="currentColor" class="text-teal-700/10" stroke-width="1">
+							<path d="M 50 200 A 150 45 0 0 1 350 200" />
+							<path d="M 73 120 A 127 35 0 0 1 327 120" />
+							<path d="M 73 280 A 127 35 0 0 1 327 280" />
+							<path d="M 200 50 L 200 350" />
+							<path d="M 200 50 A 50 150 0 0 1 200 350" />
+							<path d="M 200 50 A 100 150 0 0 1 200 350" />
+						</g>
+
+						<!-- 3D Shading Overlay -->
+						<circle cx="200" cy="200" r="150" fill="url(#globe-shading)" />
+
+						<!-- Front Graticules -->
+						<g stroke="currentColor" class="text-teal-600/40" stroke-width="1.5">
+							<path d="M 50 200 A 150 45 0 0 0 350 200" />
+							<path d="M 73 120 A 127 35 0 0 0 327 120" />
+							<path d="M 73 280 A 127 35 0 0 0 327 280" />
+							<path d="M 200 50 A 50 150 0 0 0 200 350" />
+							<path d="M 200 50 A 100 150 0 0 0 200 350" />
+							<path d="M 200 50 A 148 150 0 0 0 200 350" />
+							<path d="M 200 50 A 148 150 0 0 1 200 350" />
+						</g>
+
+						<!-- Orbit Ring 1 (Front Half) -->
+						<g transform="rotate(-15 200 200)">
+							<path d="M 10 200 A 190 60 0 0 0 390 200" stroke="currentColor" class="text-teal-500/60" stroke-width="2" />
+						</g>
+						<g transform="rotate(45 200 200)" />
+
+						<!-- Surface Drop Shadows -->
+						<g fill="currentColor" class="text-teal-900/20" filter="url(#glow-soft)">
+							<ellipse cx="110" cy="140" rx="12" ry="4" />
+							<ellipse cx="240" cy="110" rx="12" ry="4" />
+							<ellipse cx="310" cy="180" rx="12" ry="4" />
+							<ellipse cx="160" cy="260" rx="12" ry="4" />
+						</g>
+
+						<!-- High Arcing Data Connections -->
+						<g fill="none" stroke-width="2.5" stroke-linecap="round">
+							<path d="M 110 130 C 120 70, 210 60, 240 100" stroke="currentColor" class="text-teal-400/30" />
+							<path d="M 240 100 C 280 80, 315 120, 310 170" stroke="currentColor" class="text-teal-400/30" />
+							<path d="M 110 130 C 70 170, 100 240, 160 250" stroke="currentColor" class="text-teal-400/30" />
+						</g>
+
+						<!-- Floating Edge Nodes -->
+						<!-- US East -->
+						<g class="node-float" style="animation-delay: 0s">
+							<g transform="translate(110, 130)">
+								<circle cx="0" cy="0" r="8" fill="currentColor" class="text-teal-400" filter="url(#glow-intense)" />
+								<circle cx="0" cy="0" r="4" fill="#fff" />
+								<circle cx="0" cy="0" r="2" fill="currentColor" class="text-teal-500" />
+								<rect x="-32" y="-40" width="64" height="18" rx="4" fill="currentColor" class="text-white/90" />
+								<text x="0" y="-28" text-anchor="middle" font-size="9" font-weight="800" font-family="monospace" fill="currentColor" class="text-teal-800">US-EAST</text>
+							</g>
+						</g>
+
+						<!-- EU West -->
+						<g class="node-float" style="animation-delay: 0.5s">
+							<g transform="translate(240, 100)">
+								<circle cx="0" cy="0" r="8" fill="currentColor" class="text-teal-400" filter="url(#glow-intense)" />
+								<circle cx="0" cy="0" r="4" fill="#fff" />
+								<circle cx="0" cy="0" r="2" fill="currentColor" class="text-teal-500" />
+								<rect x="-32" y="-40" width="64" height="18" rx="4" fill="currentColor" class="text-white/90" />
+								<text x="0" y="-28" text-anchor="middle" font-size="9" font-weight="800" font-family="monospace" fill="currentColor" class="text-teal-800">EU-WEST</text>
+							</g>
+						</g>
+
+						<!-- Asia -->
+						<g class="node-float" style="animation-delay: 1s">
+							<g transform="translate(310, 170)">
+								<circle cx="0" cy="0" r="8" fill="currentColor" class="text-teal-400" filter="url(#glow-intense)" />
+								<circle cx="0" cy="0" r="4" fill="#fff" />
+								<circle cx="0" cy="0" r="2" fill="currentColor" class="text-teal-500" />
+								<rect x="-24" y="22" width="48" height="18" rx="4" fill="currentColor" class="text-white/90" />
+								<text x="0" y="34" text-anchor="middle" font-size="9" font-weight="800" font-family="monospace" fill="currentColor" class="text-teal-800">ASIA</text>
+							</g>
+						</g>
+
+						<!-- SA East -->
+						<g class="node-float" style="animation-delay: 1.5s">
+							<g transform="translate(160, 250)">
+								<circle cx="0" cy="0" r="8" fill="currentColor" class="text-teal-400" filter="url(#glow-intense)" />
+								<circle cx="0" cy="0" r="4" fill="#fff" />
+								<circle cx="0" cy="0" r="2" fill="currentColor" class="text-teal-500" />
+								<rect x="-32" y="22" width="64" height="18" rx="4" fill="currentColor" class="text-white/90" />
+								<text x="0" y="34" text-anchor="middle" font-size="9" font-weight="800" font-family="monospace" fill="currentColor" class="text-teal-800">SA-EAST</text>
+							</g>
+						</g>
+					</svg>
+				</div>
+			</div>
+		</article></div></section>
+
+		<!-- ============================================================ -->
+		<!-- USE CASE 2: Coding Agents (text left, terminal right)        -->
+		<!-- ============================================================ -->
+		<section class="w-full border-b border-gray-200/50 dark:border-[#141c2e] px-4"><div class="w-full"><article
+			class="mx-auto max-w-7xl grid overflow-hidden border-l border-r border-gray-200/50 dark:border-[#141c2e] bg-white dark:bg-gray-950 lg:grid-cols-2"
+		>
+			<div class="p-8 sm:p-10 lg:p-14 max-lg:order-1 lg:order-2 lg:border-l lg:border-gray-200/50 dark:lg:border-[#141c2e]">
+				<span
+					class="text-sm mb-4 inline-block rounded-full bg-violet-100 dark:bg-violet-900/30 px-4 py-1 font-semibold text-violet-700 dark:text-violet-300"
+				>
+					Coding Agents
+				</span>
+				<h2 class="mb-6 text-balance text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">
+					Give your coding agents persistent storage
+				</h2>
+				<p class="text-lg text-gray-600 dark:text-gray-400">
+					Coding agents run in ephemeral environments, but their outputs shouldn't vanish. Checkpoints, benchmark
+					results, generated datasets: one <code class="rounded bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 font-mono text-sm">hf sync</code>
+					command in your agent's bash tool is all it takes.
+				</p>
+				<ul class="mt-6 space-y-3 text-gray-600 dark:text-gray-300">
+					<li class="flex items-center gap-3">
+						<span class="flex size-5 flex-none items-center justify-center rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-400">
+							<svg class="size-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+							</svg>
+						</span>
+						<p class="text-sm sm:text-base">Pre-warmed CDN and no git overhead for fast reads and writes</p>
+					</li>
+					<li class="flex items-center gap-3">
+						<span class="flex size-5 flex-none items-center justify-center rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-400">
+							<svg class="size-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+							</svg>
+						</span>
+						<p class="text-sm sm:text-base">Persist artifacts across ephemeral CI runs and terminal sessions</p>
+					</li>
+					<li class="flex items-center gap-3">
+						<span class="flex size-5 flex-none items-center justify-center rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-400">
+							<svg class="size-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+							</svg>
+						</span>
+						<p class="text-sm sm:text-base">
+							Install the official <a
+								href="https://huggingface.co/docs/hub/en/agents-cli"
+								class="underline hover:text-violet-600 dark:hover:text-gray-300"
+							>HF CLI skill</a> and your agent knows every command
+						</p>
+					</li>
+				</ul>
+			</div>
+			<div
+				class="bg-gradient-to-br relative flex items-center justify-center from-violet-50 to-indigo-50 dark:from-violet-950/20 dark:to-indigo-950/20 p-8 max-lg:order-2 lg:p-12"
+			>
+				<div class="w-full max-w-xl">
+					<div class="shadow-xs overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/50">
+						<div class="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/60 px-4 py-2.5">
+							<span class="h-3 w-3 rounded-full bg-red-400"></span>
+							<span class="h-3 w-3 rounded-full bg-yellow-400"></span>
+							<span class="h-3 w-3 rounded-full bg-green-400"></span>
+							<span class="flex-1 text-center font-mono text-xs text-gray-500 dark:text-gray-400">terminal - bash</span>
+						</div>
+						<div class="overflow-x-auto p-4 font-mono text-[11px] leading-relaxed text-gray-700 dark:text-gray-200 sm:p-6 sm:text-[12px]">
+							<div class="mb-3 text-gray-500 dark:text-gray-400">
+								# Agent creates a bucket and syncs experiment outputs
+							</div>
+
+							<div class="mb-1">
+								<span class="text-green-600 dark:text-green-300">&#9679;</span>
+								<span class="font-semibold text-gray-900 dark:text-white"> Bash(</span><span class="text-gray-900 dark:text-white">hf buckets create training-artifacts-v2</span><span class="font-semibold text-gray-900 dark:text-white">)</span>
+							</div>
+							<div class="mb-4 pl-3 text-gray-500 dark:text-gray-400">
+								&#9492; Bucket created: <span class="text-violet-700 dark:text-violet-300">hf://buckets/acme/training-artifacts-v2</span>
+							</div>
+
+							<div class="mb-1">
+								<span class="text-green-600 dark:text-green-300">&#9679;</span>
+								<span class="font-semibold text-gray-900 dark:text-white"> Bash(</span><span class="text-gray-900 dark:text-white">hf buckets sync ./experiment_outputs/ hf://buckets/acme/training-artifacts-v2</span><span class="font-semibold text-gray-900 dark:text-white">)</span>
+							</div>
+							<div class="mb-0.5 pl-3 text-gray-500 dark:text-gray-400">
+								&#9492; Sync plan: ./experiment_outputs/ &#8594; <span class="text-violet-700 dark:text-violet-300">hf://buckets/acme/training-artifacts-v2</span>
+							</div>
+							<div class="mb-0.5 pl-7 text-gray-500 dark:text-gray-400">
+								Uploads: <span class="text-gray-900 dark:text-white">16</span>
+							</div>
+							<div class="mb-4 pl-7 text-gray-500 dark:text-gray-400">
+								Downloads: <span class="text-gray-900 dark:text-white">0</span>
+							</div>
+
+							<div class="mb-1">
+								<span class="text-green-600 dark:text-green-300">&#9679;</span>
+								<span class="text-gray-900 dark:text-white"> All done.</span>
+								<span class="text-gray-500 dark:text-gray-400">
+									Bucket acme/training-artifacts-v2 synced (14.3 GB total):</span>
+							</div>
+							<div class="mb-0.5 pl-3 text-gray-500 dark:text-gray-400">
+								- 3 checkpoints (model.safetensors, optimizer.pt, config.json)
+							</div>
+							<div class="mb-0.5 pl-3 text-gray-500 dark:text-gray-400">
+								- 6 parquet shards (data/train/ and data/eval/)
+							</div>
+							<div class="mb-3 pl-3 text-gray-500 dark:text-gray-400">- 1 training log</div>
+
+							<div class="text-gray-500 dark:text-gray-400">
+								Bucket is live at <span class="text-violet-700 dark:text-violet-300">hf://buckets/acme/training-artifacts-v2</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</article></div></section>
+
+		<!-- Spacer -->
+		<section class="w-full border-b border-gray-200/50 dark:border-[#141c2e] px-4"><div class="mx-auto h-16 max-w-7xl border-l border-r border-gray-200/50 dark:border-[#141c2e]"></div></section>
+
+		<!-- ============================================================ -->
+		<!-- Security & Compliance — v3 card layout (from reference)       -->
+		<!-- ============================================================ -->
+		<style>
+			@keyframes shield-pulse {
+				0%, 100% { transform: scale(1); opacity: 1; }
+				50% { transform: scale(1.04); opacity: 0.7; }
+			}
+			.shield-ring { animation: shield-pulse 3s ease-in-out infinite; }
+		</style>
+		<section class="w-full px-4">
+			<article class="relative mx-auto max-w-7xl overflow-hidden border-l border-r border-[#141c2e] dark:bg-gray-950">
+				<!-- Top area: shield icon + heading -->
+				<div class="relative z-10 flex flex-col items-center justify-center overflow-hidden px-8 pb-8 pt-12 sm:pt-16">
+					<div class="relative flex items-center justify-center">
+						<!-- Animated shield rings -->
+						<span class="shield-ring absolute size-28 rounded-full border border-blue-700/30" style="animation-delay: 0s"></span>
+						<span class="shield-ring absolute size-44 rounded-full border border-blue-700/20" style="animation-delay: 1s"></span>
+						<span class="shield-ring absolute size-60 rounded-full border border-blue-800/15" style="animation-delay: 2s"></span>
+						<!-- Bucket icon -->
+						<div class="relative flex flex-col items-center">
+							<svg class="size-16 text-blue-500" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 48 48" fill="none">
+								<path opacity="0.25" d="M36 4H12C7.58172 4 4 7.58172 4 12V36C4 40.4183 7.58172 44 12 44H36C40.4183 44 44 40.4183 44 36V12C44 7.58172 40.4183 4 36 4Z" fill="currentColor"/>
+								<path opacity="0.5" d="M31 11H17C13.6863 11 11 13.6863 11 17V31C11 34.3137 13.6863 37 17 37H31C34.3137 37 37 34.3137 37 31V17C37 13.6863 34.3137 11 31 11Z" fill="currentColor"/>
+								<path d="M27 18H21C19.3431 18 18 19.3431 18 21V27C18 28.6569 19.3431 30 21 30H27C28.6569 30 30 28.6569 30 27V21C30 19.3431 28.6569 18 27 18Z" fill="currentColor"/>
+							</svg>
+						</div>
+					</div>
+					<p class="mt-6 text-center text-lg text-gray-400 sm:text-xl">Enterprise-grade security at every layer</p>
+				</div>
+
+				<!-- 4-column feature grid -->
+				<div class="relative z-10 grid grid-cols-2 border-t border-[#141c2e] lg:grid-cols-4">
+					<!-- AES-256 Encryption -->
+					<div class="flex flex-col items-center border-b border-r border-[#141c2e] p-6 text-center sm:p-8 lg:border-b-0">
+						<svg class="size-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32"><path fill="currentColor" d="M24 14h-2V8a6 6 0 0 0-12 0v6H8a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V16a2 2 0 0 0-2-2ZM12 8a4 4 0 0 1 8 0v6h-8Zm12 20H8V16h16Z"/></svg>
+						<h3 class="mb-1 mt-3 text-sm font-semibold text-white">AES-256 Encryption</h3>
+						<span class="text-xs leading-relaxed text-gray-400">End-to-end encryption at rest and in transit</span>
+					</div>
+					<!-- Audit Logs -->
+					<div class="flex flex-col items-center border-b border-[#141c2e] p-6 text-center sm:p-8 lg:border-b-0 lg:border-r">
+						<svg class="size-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32"><path fill="currentColor" d="M10 18h8v2h-8zm0-5h12v2H10zm0 10h5v2h-5z"/><path fill="currentColor" d="M25 5h-3V4a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v1H7a2 2 0 0 0-2 2v21a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2ZM12 4h8v4h-8Zm13 24H7V7h3v3h12V7h3Z"/></svg>
+						<h3 class="mb-1 mt-3 text-sm font-semibold text-white">Audit Logs</h3>
+						<span class="text-xs leading-relaxed text-gray-400">Full visibility into every access event</span>
+					</div>
+					<!-- SSO & RBAC -->
+					<div class="flex flex-col items-center border-r border-[#141c2e] p-6 text-center sm:p-8">
+						<svg class="size-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32"><path fill="currentColor" d="M31 30h-2v-3a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3v3h-2v-3a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5z"/><path fill="currentColor" d="M24 12a3 3 0 1 1-3 3a3 3 0 0 1 3-3m0-2a5 5 0 1 0 5 5a5 5 0 0 0-5-5z"/><path fill="currentColor" d="M15 22h-2v-3a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v3H1v-3a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5z"/><path fill="currentColor" d="M8 4a3 3 0 1 1-3 3a3 3 0 0 1 3-3m0-2a5 5 0 1 0 5 5a5 5 0 0 0-5-5z"/></svg>
+						<h3 class="mb-1 mt-3 text-sm font-semibold text-white">SSO &amp; RBAC</h3>
+						<span class="text-xs leading-relaxed text-gray-400">Enterprise SSO with role-based access control</span>
+					</div>
+					<!-- US & EU Regions -->
+					<div class="flex flex-col items-center p-6 text-center sm:p-8">
+						<svg class="size-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32"><path fill="currentColor" d="M16 2a14 14 0 1 0 14 14A14.016 14.016 0 0 0 16 2Zm10.1 8h-4.4a18.82 18.82 0 0 0-2.85-6.36A12.03 12.03 0 0 1 26.1 10ZM16 4a11 11 0 0 1 1.615.118A14.7 14.7 0 0 1 21.08 10H10.92a14.7 14.7 0 0 1 3.465-5.882A11 11 0 0 1 16 4Zm-2.85-.36A18.82 18.82 0 0 0 10.3 10H5.9a12.03 12.03 0 0 1 7.25-6.36ZM4.551 12.5H9.28a20.2 20.2 0 0 0 0 7H4.551a11.78 11.78 0 0 1 0-7ZM5.9 22h4.4a18.82 18.82 0 0 0 2.85 6.36A12.03 12.03 0 0 1 5.9 22ZM16 28a11 11 0 0 1-1.615-.118A14.7 14.7 0 0 1 10.92 22h10.16a14.7 14.7 0 0 1-3.465 5.882A11 11 0 0 1 16 28Zm2.85.36A18.82 18.82 0 0 0 21.7 22h4.4a12.03 12.03 0 0 1-7.25 6.36ZM22.72 19.5a20.2 20.2 0 0 0 0-7h4.729a11.78 11.78 0 0 1 0 7ZM10.5 12.5h11a18.4 18.4 0 0 1 0 7h-11a18.4 18.4 0 0 1 0-7Z"/></svg>
+						<h3 class="mb-1 mt-3 text-sm font-semibold text-white">US &amp; EU Regions</h3>
+						<span class="text-xs leading-relaxed text-gray-400">Choose where your data lives</span>
+					</div>
+				</div>
+
+				<!-- SOC2 + GDPR badges -->
+				<div class="flex items-center justify-center gap-3 border-t border-[#141c2e] py-6">
+					<img
+						src="https://cdn-media.huggingface.co/marketing/pmh-page/soc2.png"
+						alt="SOC 2 Type II"
+						title="SOC 2 Type II certified"
+						class="h-8 opacity-50 brightness-125 transition-opacity hover:opacity-75"
+					/>
+					<img
+						src="https://cdn-media.huggingface.co/marketing/pmh-page/gdpr.png"
+						alt="GDPR Compliant"
+						title="GDPR compliant"
+						class="h-8 opacity-50 brightness-125 transition-opacity hover:opacity-75"
+					/>
+				</div>
+			</article>
+		</section>
+
+		<!-- ============================================================ -->
+		<!-- CTA: Get started with HF Storage Buckets                     -->
+		<!-- ============================================================ -->
+		<section class="w-full border-b border-gray-200/50 dark:border-[#141c2e] px-4">
+		<div class="w-full"><article
+			class="relative mx-auto max-w-7xl flex flex-col items-center overflow-hidden text-balance border-l border-r border-gray-200/50 dark:border-[#141c2e] bg-white dark:bg-gray-950 p-8 text-center max-sm:py-12 sm:p-10 lg:p-14"
+		>
+			<div class="absolute inset-0 bg-[url('https://cdn-uploads.huggingface.co/production/uploads/5f17f0a0925b9863e28ad517/7yYe9E-d38GWl6bnEUhhG.png')] bg-cover bg-center bg-no-repeat opacity-30 dark:opacity-15"></div>
+			<h2 class="relative mb-3 text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white xl:text-5xl">
+				Get started with <span class="relative inline-block">
+					<span
+						class="bg-gradient-to-br relative from-blue-500 from-15% via-blue-500 to-sky-500 bg-clip-text font-bold text-transparent"
+						style="font-weight: 700;"
+					>
+						HF Storage Buckets
+					</span>
+					<span
+						class="bg-gradient-to-br absolute left-0 from-blue-500 from-15% via-blue-500 to-sky-500 bg-clip-text font-bold text-transparent opacity-25 blur-xl"
+						style="font-weight: 700;"
+					>
+						HF Storage Buckets
+					</span>
+				</span>
+			</h2>
+			<p class="relative mb-6 text-xl text-gray-600 dark:text-gray-400 sm:text-2xl xl:mb-12">
+				Start with buckets, sync your AI data, and unlock object storage built for ML workflows.
+			</p>
+			<div class="mx-auto flex w-full flex-col items-center justify-center gap-1.5 sm:gap-3 md:flex-row">
+				<a
+					href="/new-bucket"
+					class="ring-offset-[3px] relative z-[1] flex w-fit items-center gap-[10px] whitespace-nowrap rounded-full bg-black px-5 py-2 text-white ring-1 ring-gray-300 transition-all hover:ring-black dark:bg-gray-100 dark:text-black dark:ring-gray-100 dark:ring-offset-gray-950 sm:text-lg"
+				><span>&rarr;</span><span>Create a Bucket</span></a>
+				<span class="text-gray-500">or</span>
+				<a
+					href="/settings/billing?add-storage=true"
+					class="ring-offset-[3px] relative z-[1]flex w-fit items-center gap-1.5 whitespace-nowrap rounded-full bg-gray-200 px-5 py-2 text-base text-gray-900 ring-1 ring-gray-300 transition-all hover:ring-gray-500 dark:bg-gray-600 dark:text-gray-300 dark:ring-gray-600 dark:ring-offset-gray-950 sm:text-lg"
+				>Get a Storage package</a>
+			</div>
+		</article></div>
+		</section>
+
+	</div>
+
+	<!-- Perspective bucket lines for hero section -->
+	<script>
+	(function() {
+		var N = 10;
+		var LINE_COLOR = '#141c2e';
+		var LINE_WIDTH = 0.667;
+		var NS = 'http://www.w3.org/2000/svg';
+		var BLUE = '#2B7FFF';
+
+		function lerp(a, b, t) { return a + (b - a) * t; }
+		function dist(x1,y1,x2,y2) { return Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1)); }
+		function rand(a, b) { return a + Math.random() * (b - a); }
+
+		// Shared geometry — updated by draw()
+		var geo = { W:0, H:0, fL:0, fT:0, fRi:0, fB:0, gapX:8, gapY:8, dotsOX:0, dotsOY:0 };
+
+		// ==================== draw() — static perspective lines ====================
+		function draw() {
+			var section = document.getElementById('hero-section');
+			var floor = document.getElementById('hero-floor');
+			var title = document.getElementById('hero-title');
+			var g = document.getElementById('bucket-lines');
+			var defsEl = document.getElementById('bucket-defs');
+			if (!section || !floor || !title || !g || !defsEl) return;
+
+			g.innerHTML = '';
+			defsEl.innerHTML = '';
+
+			var sR = section.getBoundingClientRect();
+			var fR = floor.getBoundingClientRect();
+
+			var W = sR.width, H = sR.height;
+			var fL = fR.left - sR.left, fT = fR.top - sR.top;
+			var fRi = fR.right - sR.left, fB = fR.bottom - sR.top;
+			var fw = fRi - fL, fh = fB - fT;
+
+			// Store in shared geometry
+			geo.W=W; geo.H=H; geo.fL=fL; geo.fT=fT; geo.fRi=fRi; geo.fB=fB;
+
+			// Floor-cutout mask in shared <defs>
+			var mask = document.createElementNS(NS, 'mask');
+			mask.setAttribute('id', 'floor-cutout');
+			var mbg = document.createElementNS(NS, 'rect');
+			mbg.setAttribute('width', W); mbg.setAttribute('height', H); mbg.setAttribute('fill', 'white');
+			mask.appendChild(mbg);
+			var mr = document.createElementNS(NS, 'rect');
+			mr.setAttribute('x',fL); mr.setAttribute('y',fT);
+			mr.setAttribute('width',fw); mr.setAttribute('height',fh); mr.setAttribute('fill','black');
+			mask.appendChild(mr);
+			defsEl.appendChild(mask);
+
+			// Lines group with mask
+			var linesG = document.createElementNS(NS, 'g');
+			linesG.setAttribute('mask', 'url(#floor-cutout)');
+			for (var i = 0; i <= N; i++) {
+				var t = i / N;
+				addSvgLine(linesG, lerp(0,W,t), 0, lerp(fL,fRi,t), fT);
+				addSvgLine(linesG, lerp(0,W,t), H, lerp(fL,fRi,t), fB);
+				addSvgLine(linesG, 0, lerp(0,H,t), fL, lerp(fT,fB,t));
+				addSvgLine(linesG, W, lerp(0,H,t), fRi, lerp(fT,fB,t));
+			}
+			g.appendChild(linesG);
+
+			// Apply mask to anim-blue-lines too
+			var animG = document.getElementById('anim-blue-lines');
+			if (animG) animG.setAttribute('mask', 'url(#floor-cutout)');
+
+			// Dot grid alignment
+			var lineGapX = fw / N, lineGapY = fh / N;
+			var subX = Math.max(1, Math.round(lineGapX / 8));
+			var subY = Math.max(1, Math.round(lineGapY / 8));
+			var gapX = lineGapX / subX, gapY = lineGapY / subY;
+			geo.gapX = gapX; geo.gapY = gapY;
+			geo.dotsOX = fL; // first dot x in section coords
+			geo.dotsOY = fT; // first dot y in section coords
+
+			// Hide CSS dot pattern — we'll use SVG dots instead
+			var cssDotsDiv = document.getElementById('hero-dots');
+			if (cssDotsDiv) cssDotsDiv.style.display = 'none';
+
+			// Render all floor dots as SVG circles for individual color control
+			var dotsG = document.getElementById('anim-dot-ripples');
+			if (dotsG) {
+				dotsG.innerHTML = '';
+				geo.dotEls = []; // 2D array of dot SVG elements
+				var cols = Math.floor(fw / gapX) + 1;
+				var rows = Math.floor(fh / gapY) + 1;
+				geo.dotCols = cols; geo.dotRows = rows;
+				// Radial fade mask values (matching the CSS mask)
+				var cx = fL + fw/2, cy = fT + fh/2;
+				var maxDist = Math.sqrt((fw/2)*(fw/2) + (fh/2)*(fh/2));
+				for (var row = 0; row < rows; row++) {
+					geo.dotEls[row] = [];
+					for (var col = 0; col < cols; col++) {
+						var dx = fL + col * gapX;
+						var dy = fT + row * gapY;
+						// Radial fade: transparent at center, visible at edges
+						var d = Math.sqrt((dx-cx)*(dx-cx) + (dy-cy)*(dy-cy));
+						var fadeT = d / maxDist; // 0 at center, 1 at corner
+						var opacity;
+						if (fadeT < 0.1) opacity = 0;
+						else if (fadeT < 0.45) opacity = (fadeT - 0.1) / 0.35 * 0.6 * 0.22;
+						else opacity = 0.22;
+						var c = document.createElementNS(NS, 'circle');
+						c.setAttribute('cx', dx);
+						c.setAttribute('cy', dy);
+						c.setAttribute('r', 0.5);
+						c.setAttribute('fill', 'rgba(255,255,255,' + opacity.toFixed(4) + ')');
+						c.dataset.baseOpacity = opacity;
+						c.dataset.col = col;
+						c.dataset.row = row;
+						dotsG.appendChild(c);
+						geo.dotEls[row][col] = c;
+					}
+				}
+			}
+		}
+
+		function addSvgLine(parent, x1,y1,x2,y2) {
+			var l = document.createElementNS(NS, 'line');
+			l.setAttribute('x1',x1); l.setAttribute('y1',y1);
+			l.setAttribute('x2',x2); l.setAttribute('y2',y2);
+			l.setAttribute('stroke', LINE_COLOR); l.setAttribute('stroke-width', LINE_WIDTH);
+			parent.appendChild(l);
+		}
+
+		// ==================== Animation system ====================
+		var anim = { lines: [], ripples: [], lastSpawn: 0, nextDelay: 1000 };
+		var animRunning = false, animFrameId = null;
+		var MAX_LINES = 4;
+		var SPAWN_DIST = 50; // pixels outside the rim where lines spawn
+
+		function spawnLine() {
+			if (anim.lines.length >= MAX_LINES) return;
+			var W=geo.W, H=geo.H, fL=geo.fL, fT=geo.fT, fRi=geo.fRi, fB=geo.fB;
+			if (W === 0) return;
+
+			// Pick edge: left 30%, right 30%, bottom 40%
+			var r = Math.random();
+			var edge = r < 0.3 ? 'left' : r < 0.6 ? 'right' : 'bottom';
+
+			// Pick t (40% chance snap to perspective line)
+			var t = Math.random() < 0.4 ? Math.round(Math.random() * N) / N : Math.random();
+
+			var rimX, rimY, floorX, floorY, outX, outY;
+			if (edge === 'left') {
+				rimX = 0; rimY = lerp(0, H, t);
+				floorX = fL; floorY = lerp(fT, fB, t);
+				outX = -SPAWN_DIST; outY = rimY;
+			} else if (edge === 'right') {
+				rimX = W; rimY = lerp(0, H, t);
+				floorX = fRi; floorY = lerp(fT, fB, t);
+				outX = W + SPAWN_DIST; outY = rimY;
+			} else {
+				rimX = lerp(0, W, t); rimY = H;
+				floorX = lerp(fL, fRi, t); floorY = fB;
+				outX = rimX; outY = H + SPAWN_DIST;
+			}
+
+			var outsideDist = SPAWN_DIST;
+			var insideDist = dist(rimX, rimY, floorX, floorY);
+			var totalDist = outsideDist + insideDist;
+			var lineLen = rand(15, 40);
+			var speed = totalDist / rand(3000, 5000); // px per ms
+
+			var el = document.createElementNS(NS, 'polyline');
+			el.setAttribute('fill', 'none');
+			el.setAttribute('stroke', BLUE);
+			el.setAttribute('stroke-width', '1');
+			el.setAttribute('stroke-linecap', 'round');
+			el.setAttribute('opacity', '0.8');
+			var animG = document.getElementById('anim-blue-lines');
+			if (animG) animG.appendChild(el);
+
+			anim.lines.push({
+				el: el, edge: edge, t: t,
+				outX: outX, outY: outY,
+				rimX: rimX, rimY: rimY,
+				floorX: floorX, floorY: floorY,
+				outsideDist: outsideDist, insideDist: insideDist, totalDist: totalDist,
+				lineLen: lineLen, speed: speed,
+				traveled: 0
+			});
+		}
+
+		function posOnPath(line, d) {
+			// d = distance along the total path (outside + inside)
+			if (d <= line.outsideDist) {
+				// Still in outside segment (perpendicular approach)
+				var p = d / line.outsideDist;
+				return { x: lerp(line.outX, line.rimX, p), y: lerp(line.outY, line.rimY, p) };
+			} else {
+				// Inside segment (perspective direction)
+				var inner = d - line.outsideDist;
+				var p = Math.min(1, inner / line.insideDist);
+				return { x: lerp(line.rimX, line.floorX, p), y: lerp(line.rimY, line.floorY, p) };
+			}
+		}
+
+		function updateLine(line, dt) {
+			// Smooth continuous motion
+			line.traveled += line.speed * dt;
+			var headD = Math.min(line.traveled, line.totalDist);
+			var tailD = Math.max(0, line.traveled - line.lineLen);
+
+			// No fade — line emerges from tip at full opacity like coming out of a portal
+			line.el.setAttribute('opacity', '0.8');
+
+			// Compute polyline points
+			var head = posOnPath(line, headD);
+			var tail = posOnPath(line, Math.min(tailD, line.totalDist));
+
+			var headInside = headD > line.outsideDist;
+			var tailInside = tailD > line.outsideDist;
+
+			var pts;
+			if (!headInside && !tailInside) {
+				pts = tail.x+','+tail.y+' '+head.x+','+head.y;
+			} else if (headInside && !tailInside) {
+				pts = tail.x+','+tail.y+' '+line.rimX+','+line.rimY+' '+head.x+','+head.y;
+			} else {
+				pts = tail.x+','+tail.y+' '+head.x+','+head.y;
+			}
+			line.el.setAttribute('points', pts);
+
+			// Done when TAIL reaches the floor (not head)
+			// Trigger ripple when HEAD first reaches floor
+			if (headD >= line.totalDist && !line.rippleTriggered) {
+				line.rippleTriggered = true;
+				createRipple(line.floorX, line.floorY);
+			}
+			return tailD >= line.totalDist;
+		}
+
+		function createRipple(cx, cy) {
+			if (!geo.dotEls) return;
+			var maxR = 60;
+			var duration = rand(3000, 5000);
+			var dots = [];
+			var gx = geo.gapX, gy = geo.gapY;
+			var ox = geo.dotsOX, oy = geo.dotsOY;
+
+			// Find dot grid indices near (cx, cy) within maxR
+			var colStart = Math.max(0, Math.floor((cx - maxR - ox) / gx));
+			var colEnd = Math.min(geo.dotCols - 1, Math.ceil((cx + maxR - ox) / gx));
+			var rowStart = Math.max(0, Math.floor((cy - maxR - oy) / gy));
+			var rowEnd = Math.min(geo.dotRows - 1, Math.ceil((cy + maxR - oy) / gy));
+
+			for (var row = rowStart; row <= rowEnd; row++) {
+				for (var col = colStart; col <= colEnd; col++) {
+					var dx = ox + col * gx;
+					var dy = oy + row * gy;
+					var d = dist(cx, cy, dx, dy);
+					if (d > maxR) continue;
+					var el = geo.dotEls[row] && geo.dotEls[row][col];
+					if (!el) continue;
+					dots.push({ el: el, dist: d, baseOpacity: parseFloat(el.dataset.baseOpacity) || 0 });
+				}
+			}
+
+			anim.ripples.push({ cx:cx, cy:cy, startTime: performance.now(), duration: duration, maxR: maxR, dots: dots });
+		}
+
+		function updateRipple(ripple, now) {
+			var elapsed = now - ripple.startTime;
+			var progress = elapsed / ripple.duration;
+			if (progress >= 1) return true; // done
+
+			var wavefront = progress * ripple.maxR;
+			for (var i = 0; i < ripple.dots.length; i++) {
+				var dot = ripple.dots[i];
+				if (dot.dist <= wavefront) {
+					var distFade = 1 - dot.dist / ripple.maxR;
+					var timeFade = 1 - progress;
+					var blueStrength = distFade * timeFade;
+					if (blueStrength > 0.02) {
+						dot.el.setAttribute('fill', BLUE);
+						dot.el.setAttribute('r', (0.5 + blueStrength * 0.5).toFixed(3));
+						dot.el.setAttribute('opacity', Math.max(dot.baseOpacity, blueStrength * 0.9).toFixed(3));
+					} else {
+						// Restore to base when blue fades out
+						dot.el.setAttribute('fill', 'rgba(255,255,255,' + dot.baseOpacity.toFixed(4) + ')');
+						dot.el.setAttribute('r', '0.5');
+						dot.el.removeAttribute('opacity');
+					}
+				}
+			}
+			return false;
+		}
+
+		function cleanupRipple(ripple) {
+			for (var i = 0; i < ripple.dots.length; i++) {
+				var dot = ripple.dots[i];
+				dot.el.setAttribute('fill', 'rgba(255,255,255,' + dot.baseOpacity.toFixed(4) + ')');
+				dot.el.setAttribute('r', '0.5');
+				dot.el.removeAttribute('opacity');
+			}
+		}
+
+		var FRAME_MS = 16; // ~60fps
+		var lastFrame = 0;
+		function animLoop() {
+			if (!animRunning) return;
+			var now = performance.now();
+			var dt = lastFrame ? now - lastFrame : FRAME_MS;
+			lastFrame = now;
+
+			// Spawn timer
+			if (now - anim.lastSpawn > anim.nextDelay) {
+				spawnLine();
+				anim.lastSpawn = now;
+				anim.nextDelay = rand(1000, 2500);
+			}
+
+			// Update lines (ripple is triggered inside updateLine when head reaches floor)
+			for (var i = anim.lines.length - 1; i >= 0; i--) {
+				var done = updateLine(anim.lines[i], dt);
+				if (done) {
+					anim.lines[i].el.remove();
+					anim.lines.splice(i, 1);
+				}
+			}
+
+			// Update ripples
+			for (var i = anim.ripples.length - 1; i >= 0; i--) {
+				var done = updateRipple(anim.ripples[i], now);
+				if (done) {
+					cleanupRipple(anim.ripples[i]);
+					anim.ripples.splice(i, 1);
+				}
+			}
+
+			animFrameId = setTimeout(animLoop, FRAME_MS);
+		}
+
+		function startAnimation() {
+			if (animRunning) return;
+			animRunning = true;
+			lastFrame = 0;
+			anim.lastSpawn = performance.now();
+			anim.nextDelay = rand(500, 1500);
+			animFrameId = setTimeout(animLoop, FRAME_MS);
+		}
+
+		function stopAnimation() {
+			animRunning = false;
+			if (animFrameId) clearTimeout(animFrameId);
+			// Clear all animated elements
+			var ag = document.getElementById('anim-blue-lines');
+			var rg = document.getElementById('anim-dot-ripples');
+			if (ag) ag.innerHTML = '';
+			if (rg) rg.innerHTML = '';
+			anim.lines = [];
+			anim.ripples = [];
+		}
+
+		// ==================== Init ====================
+		draw();
+
+		window.addEventListener('resize', function() {
+			stopAnimation();
+			draw();
+			startAnimation();
+		});
+		if (document.fonts && document.fonts.ready) {
+			document.fonts.ready.then(function() { draw(); });
+		}
+
+		// Start animation immediately
+		startAnimation();
+
+		// Pause when off-screen (skip initial callback to avoid race)
+		if (typeof IntersectionObserver !== 'undefined') {
+			var section = document.getElementById('hero-section');
+			if (section) {
+				var observerFired = false;
+				new IntersectionObserver(function(entries) {
+					if (!observerFired) { observerFired = true; return; } // skip first callback
+					if (entries[0].isIntersecting) { if (!animRunning) startAnimation(); }
+					else { stopAnimation(); }
+				}, { threshold: 0 }).observe(section);
+			}
+		}
+	})();
+	</script>
+</body>
+</html>
