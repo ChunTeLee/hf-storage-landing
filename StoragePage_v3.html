@@ -1071,10 +1071,9 @@
 			var mbg = document.createElementNS(NS, 'rect');
 			mbg.setAttribute('width', W); mbg.setAttribute('height', H); mbg.setAttribute('fill', 'white');
 			mask.appendChild(mbg);
-			var maskInsetY = fh * 0.08; // reduce vertical mask by 8% on each side
 			var mr = document.createElementNS(NS, 'rect');
-			mr.setAttribute('x',fL); mr.setAttribute('y',fT + maskInsetY);
-			mr.setAttribute('width',fw); mr.setAttribute('height',fh - maskInsetY * 2); mr.setAttribute('fill','black');
+			mr.setAttribute('x',fL); mr.setAttribute('y',fT);
+			mr.setAttribute('width',fw); mr.setAttribute('height',fh); mr.setAttribute('fill','black');
 			mask.appendChild(mr);
 			defsEl.appendChild(mask);
 
@@ -1115,27 +1114,18 @@
 				var cols = Math.floor(fw / gapX) + 1;
 				var rows = Math.floor(fh / gapY) + 1;
 				geo.dotCols = cols; geo.dotRows = rows;
-				// Radial fade mask values (matching the CSS mask)
-				var cx = fL + fw/2, cy = fT + fh/2;
-				var maxDist = Math.sqrt((fw/2)*(fw/2) + (fh/2)*(fh/2));
+				var dotOpacity = 0.22;
 				for (var row = 0; row < rows; row++) {
 					geo.dotEls[row] = [];
 					for (var col = 0; col < cols; col++) {
 						var dx = fL + col * gapX;
 						var dy = fT + row * gapY;
-						// Radial fade: transparent at center, visible at edges
-						var d = Math.sqrt((dx-cx)*(dx-cx) + (dy-cy)*(dy-cy));
-						var fadeT = d / maxDist; // 0 at center, 1 at corner
-						var opacity;
-						if (fadeT < 0.1) opacity = 0;
-						else if (fadeT < 0.45) opacity = (fadeT - 0.1) / 0.35 * 0.6 * 0.22;
-						else opacity = 0.22;
 						var c = document.createElementNS(NS, 'circle');
 						c.setAttribute('cx', dx);
 						c.setAttribute('cy', dy);
 						c.setAttribute('r', 0.5);
-						c.setAttribute('fill', 'rgba(255,255,255,' + opacity.toFixed(4) + ')');
-						c.dataset.baseOpacity = opacity;
+						c.setAttribute('fill', 'rgba(255,255,255,' + dotOpacity + ')');
+						c.dataset.baseOpacity = dotOpacity;
 						c.dataset.col = col;
 						c.dataset.row = row;
 						dotsG.appendChild(c);
