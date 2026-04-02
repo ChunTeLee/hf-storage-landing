@@ -1488,18 +1488,7 @@
 		})();
 		startAnimation();
 
-		// Pause when off-screen (skip initial callback to avoid race)
-		if (typeof IntersectionObserver !== 'undefined') {
-			var section = document.getElementById('hero-section');
-			if (section) {
-				var observerFired = false;
-				new IntersectionObserver(function(entries) {
-					if (!observerFired) { observerFired = true; return; } // skip first callback
-					if (entries[0].isIntersecting) { if (!animRunning) startAnimation(); }
-					else { stopAnimation(); }
-				}, { threshold: 0 }).observe(section);
-			}
-		}
+		// Animation runs continuously — no pause on scroll
 	})();
 	</script>
 </body>
