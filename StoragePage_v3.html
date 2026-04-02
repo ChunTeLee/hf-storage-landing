@@ -1104,14 +1104,33 @@
 			// Store in shared geometry
 			geo.W=W; geo.H=H; geo.fL=fL; geo.fT=fT; geo.fRi=fRi; geo.fB=fB;
 
-			// Perspective lines (no mask)
+			// Floor-cutout mask in shared <defs>
+			var mask = document.createElementNS(NS, 'mask');
+			mask.setAttribute('id', 'floor-cutout');
+			var mbg = document.createElementNS(NS, 'rect');
+			mbg.setAttribute('width', W); mbg.setAttribute('height', H); mbg.setAttribute('fill', 'white');
+			mask.appendChild(mbg);
+			var mr = document.createElementNS(NS, 'rect');
+			mr.setAttribute('x',fL); mr.setAttribute('y',fT);
+			mr.setAttribute('width',fw); mr.setAttribute('height',fh); mr.setAttribute('fill','black');
+			mask.appendChild(mr);
+			defsEl.appendChild(mask);
+
+			// Lines group with mask
+			var linesG = document.createElementNS(NS, 'g');
+			linesG.setAttribute('mask', 'url(#floor-cutout)');
 			for (var i = 0; i <= N; i++) {
 				var t = i / N;
-				addSvgLine(g, lerp(0,W,t), 0, lerp(fL,fRi,t), fT);
-				addSvgLine(g, lerp(0,W,t), H, lerp(fL,fRi,t), fB);
-				addSvgLine(g, 0, lerp(0,H,t), fL, lerp(fT,fB,t));
-				addSvgLine(g, W, lerp(0,H,t), fRi, lerp(fT,fB,t));
+				addSvgLine(linesG, lerp(0,W,t), 0, lerp(fL,fRi,t), fT);
+				addSvgLine(linesG, lerp(0,W,t), H, lerp(fL,fRi,t), fB);
+				addSvgLine(linesG, 0, lerp(0,H,t), fL, lerp(fT,fB,t));
+				addSvgLine(linesG, W, lerp(0,H,t), fRi, lerp(fT,fB,t));
 			}
+			g.appendChild(linesG);
+
+			// Apply mask to anim-blue-lines too
+			var animG = document.getElementById('anim-blue-lines');
+			if (animG) animG.setAttribute('mask', 'url(#floor-cutout)');
 
 			// Dot grid alignment
 			var lineGapX = fw / N, lineGapY = fh / N;
