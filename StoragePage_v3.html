@@ -1198,8 +1198,8 @@
 			var r = Math.random();
 			var edge = r < 0.2 ? 'top' : r < 0.4 ? 'left' : r < 0.6 ? 'right' : 'bottom';
 
-			// Pick t (40% chance snap to perspective line)
-			var t = Math.random() < 0.4 ? Math.round(Math.random() * N) / N : Math.random();
+			// Always snap to a perspective line
+			var t = Math.round(Math.random() * N) / N;
 
 			var rimX, rimY, floorX, floorY, outX, outY;
 			if (edge === 'top') {
