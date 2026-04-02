@@ -1153,7 +1153,7 @@
 				var cols = Math.round(fw / gapX) + 1;
 				var rows = Math.round(fh / gapY) + 1;
 				geo.dotCols = cols; geo.dotRows = rows;
-				var dotOpacity = 0.22;
+				var dotOpacity = isDark() ? 0.22 : 0.3;
 				var dotFill = getDotFill(dotOpacity);
 				for (var row = 0; row < rows; row++) {
 					geo.dotEls[row] = [];
@@ -1422,11 +1422,19 @@
 		function stopAnimation() {
 			animRunning = false;
 			if (animFrameId) clearTimeout(animFrameId);
-			// Clear all animated elements
+			// Only clear blue lines, NOT the dot grid (it contains base dots)
 			var ag = document.getElementById('anim-blue-lines');
-			var rg = document.getElementById('anim-dot-ripples');
 			if (ag) ag.innerHTML = '';
-			if (rg) rg.innerHTML = '';
+			// Restore any blue-tinted dots back to base
+			if (anim._prevBlue) {
+				for (var key in anim._prevBlue) {
+					var info = anim._prevBlue[key];
+					info.el.setAttribute('fill', getDotFill(info.baseOpacity));
+					info.el.setAttribute('r', '0.5');
+					info.el.removeAttribute('opacity');
+				}
+				anim._prevBlue = {};
+			}
 			anim.lines = [];
 			anim.ripples = [];
 		}
