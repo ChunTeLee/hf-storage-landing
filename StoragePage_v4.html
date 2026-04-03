@@ -126,892 +126,198 @@
 		<!-- Spacer -->
 		<section class="w-full border-b border-gray-200/50 dark:border-[#141c2e] px-4"><div class="mx-auto h-16 max-w-7xl border-l border-r border-gray-200/50 dark:border-[#141c2e]"></div></section>
 
-		<!-- ============================================ -->
-		<!-- SECTION 2: OBJECT STORAGE TERMINAL            -->
-		<!-- ============================================ -->
-		<section class="w-full border-b border-gray-200/50 dark:border-[#141c2e] px-4"><div class="w-full"><article
-			class="mx-auto max-w-7xl grid overflow-hidden border-l border-r border-gray-200/50 dark:border-[#141c2e] bg-white dark:bg-gray-950 lg:grid-cols-2"
-		>
-			<div class="p-8 sm:p-10 lg:p-14">
-				<span
-					class="text-sm mb-4 inline-block rounded-full bg-blue-100 dark:bg-blue-900/30 px-4 py-1 font-semibold text-blue-700 dark:text-blue-300"
-				>
-					Storage
-				</span>
-				<h2 class="mb-6 text-balance text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">
-					Storage built for AI teams
-				</h2>
-				<p class="mb-8 text-lg text-gray-600 dark:text-gray-400">
-					Store models, datasets, and artifacts with simple per-TB pricing. Xet deduplication. Included CDN. No git
-					overhead.
-				</p>
-				<div class="space-y-4">
-					<div class="flex items-center gap-3">
-						<div class="flex size-5 shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50">
-							<svg class="size-3 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-							</svg>
-						</div>
-						<p class="text-sm text-gray-700 dark:text-gray-300 sm:text-base">
-							Per-TB pricing with built-in CDN and deduplication speedups.
-						</p>
-					</div>
-					<div class="flex items-center gap-3">
-						<div class="flex size-5 shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50">
-							<svg class="size-3 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-							</svg>
-						</div>
-						<p class="text-sm text-gray-700 dark:text-gray-300 sm:text-base">
-							No Git constraints: commit-free sync and fast object updates.
-						</p>
-					</div>
-					<div class="flex items-center gap-3">
-						<div class="flex size-5 shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50">
-							<svg class="size-3 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-							</svg>
-						</div>
-						<p class="text-sm text-gray-700 dark:text-gray-300 sm:text-base">
-							Designed for ML workflows: datasets, checkpoints, model artifacts.
-						</p>
-					</div>
-				</div>
-			</div>
-			<div
-				class="bg-gradient-to-br relative flex items-center justify-center overflow-hidden from-sky-50 to-blue-50 dark:from-blue-950/20 dark:to-sky-950/20 p-8 max-lg:order-2 lg:p-12"
-			>
-				<div class="w-full max-w-xl">
-					<div class="shadow-xs overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/50">
-						<div class="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/60 px-4 py-2.5">
-							<span class="h-3 w-3 rounded-full bg-red-400"></span>
-							<span class="h-3 w-3 rounded-full bg-yellow-400"></span>
-							<span class="h-3 w-3 rounded-full bg-green-400"></span>
-							<span class="flex-1 text-center font-mono text-xs text-gray-500 dark:text-gray-400">terminal - bash</span>
-						</div>
-						<div class="overflow-x-auto p-4 font-mono text-[11px] leading-relaxed text-gray-700 dark:text-gray-200 sm:p-6 sm:text-[12px]">
-							<div class="mb-1 text-gray-500 dark:text-gray-400"># Create a storage bucket</div>
-							<div class="mb-3">
-								<span class="text-green-600 dark:text-green-300">$</span>
-								<span class="text-gray-900 dark:text-white"> hf buckets create</span>
-								<span class="text-cyan-600 dark:text-cyan-300"> acme-corp/training-data</span>
-							</div>
-							<div class="mb-1 pl-0 text-gray-500 dark:text-gray-400">
-								<span class="text-green-600 dark:text-green-300">&#10003;</span> Bucket created:
-								<span class="text-cyan-700 dark:text-cyan-200"> hf://buckets/acme-corp/training-data</span>
-							</div>
-							<div class="mb-4 pl-0 text-gray-500 dark:text-gray-400">
-								<span class="text-green-600 dark:text-green-300">&#10003;</span> Visibility:
-								<span class="text-gray-900 dark:text-white">private</span> &middot; Region:
-								<span class="text-gray-900 dark:text-white">us-east-1</span>
-							</div>
-							<div class="mb-1 text-gray-500 dark:text-gray-400"># Sync training data to the bucket</div>
-							<div class="mb-3">
-								<span class="text-green-600 dark:text-green-300">$</span>
-								<span class="text-gray-900 dark:text-white"> hf sync</span>
-								<span class="text-yellow-600"> ./checkpoints/</span>
-								<span class="text-cyan-600 dark:text-cyan-300"> hf://buckets/acme-corp/training-data</span>
-							</div>
-							<div class="mb-0.5 text-gray-500 dark:text-gray-400">
-								Scanning local files...
-								<span class="text-gray-900 dark:text-white">12,847 files</span> (<span class="text-gray-900 dark:text-white">2.4 TB</span>)
-							</div>
-							<div class="mb-0.5 text-gray-500 dark:text-gray-400">
-								Xet dedup:
-								<span class="text-green-600 dark:text-green-300">62% deduplicated</span> : uploading
-								<span class="text-gray-900 dark:text-white">912 GB</span> (saved 1.5 TB)
-							</div>
-							<div class="mb-1">
-								<span class="text-green-600 dark:text-green-300">&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;</span><span class="text-gray-300 dark:text-gray-600">&#9608;&#9608;&#9608;&#9608;&#9608;</span>
-								<span class="text-gray-900 dark:text-white"> 78%</span>
-								<span class="text-gray-500 dark:text-gray-400"> 714/912 GB &middot; 2.1 GB/s &middot; ETA 1m 34s</span>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</article></div></section>
-
-		<!-- ============================================ -->
-		<!-- SECTION 3: Xet Dedup Deep-Dive              -->
-		<!-- ============================================ -->
-		<section class="w-full border-b border-gray-200/50 dark:border-[#141c2e] px-4"><div class="w-full"><article
-			class="mx-auto max-w-7xl relative z-10 grid overflow-hidden border-l border-r border-gray-200/50 dark:border-[#141c2e] bg-white dark:bg-gray-950 lg:grid-cols-2"
-		>
-			<div class="p-8 sm:p-10 lg:p-14 max-lg:order-1 lg:order-2 lg:border-l lg:border-gray-200/50 dark:lg:border-[#141c2e]">
-				<span
-					class="text-sm mb-4 inline-block rounded-full bg-pink-100 dark:bg-pink-900/30 px-4 py-1 font-semibold text-pink-700 dark:text-pink-300"
-				>
-					Xet Technology
-				</span>
-				<h2 class="mb-6 text-balance text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">
-					Next-gen large-scale storage for AI
-				</h2>
-				<p class="mb-8 text-lg text-gray-600 dark:text-gray-400">
-					Xet uses content-defined chunking to break files into byte-level chunks and deduplicates across your entire
-					bucket. When you retrain a model and only 5% of weights change, only that 5% is re-uploaded.
-				</p>
-
-				<!-- Benefits list -->
-				<div class="space-y-4">
-					<div class="flex items-center gap-3">
-						<div class="flex size-5 shrink-0 items-center justify-center rounded-full bg-pink-100 dark:bg-pink-900/50">
-							<svg class="size-3 text-pink-600 dark:text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-							</svg>
-						</div>
-						<p class="text-sm text-gray-700 dark:text-gray-300 sm:text-base">
-							Raw + processed dataset: stored once, billed once*
-						</p>
-					</div>
-					<div class="flex items-center gap-3">
-						<div class="flex size-5 shrink-0 items-center justify-center rounded-full bg-pink-100 dark:bg-pink-900/50">
-							<svg class="size-3 text-pink-600 dark:text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-							</svg>
-						</div>
-						<p class="text-sm text-gray-700 dark:text-gray-300 sm:text-base">
-							4x less data per upload, verified with real-world workloads
-						</p>
-					</div>
-				</div>
-				<p class="mt-4 text-xs text-gray-400">
-					*Requires <a href="/enterprise" class="underline underline-offset-2 hover:text-gray-600 dark:hover:text-gray-300">Enterprise or Enterprise Plus</a> plan
-				</p>
-			</div>
-
-			<!-- Dedup visual (right column) -->
-			<div
-				class="bg-gradient-to-br relative flex items-center justify-center overflow-hidden from-pink-50 to-purple-50 dark:from-pink-950/20 dark:to-purple-950/20 p-8 max-lg:order-2 max-lg:pb-16 lg:p-12"
-			>
-				<div class="w-full max-w-md space-y-4">
-					<!-- Traditional upload -->
-					<div class="shadow-xs rounded-xl bg-white dark:bg-gray-900 p-5">
-						<p class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-							Traditional S3 Upload
-						</p>
-						<div class="mb-2 flex gap-1">
-							<div class="h-6 flex-1 rounded bg-amber-200 dark:bg-amber-900/35"></div>
-							<div class="h-6 flex-1 rounded bg-amber-200 dark:bg-amber-900/35"></div>
-							<div class="h-6 flex-1 rounded bg-amber-200 dark:bg-amber-900/35"></div>
-							<div class="h-6 flex-1 rounded bg-amber-300 dark:bg-amber-900/35"></div>
-							<div class="h-6 flex-1 rounded bg-amber-200 dark:bg-amber-900/35"></div>
-							<div class="h-6 flex-1 rounded bg-amber-200 dark:bg-amber-900/35"></div>
-							<div class="h-6 flex-1 rounded bg-amber-200 dark:bg-amber-900/35"></div>
-							<div class="h-6 flex-1 rounded bg-amber-200 dark:bg-amber-900/35"></div>
-						</div>
-						<p class="text-right font-mono text-sm text-amber-600">8 / 8 chunks uploaded</p>
-					</div>
-
-					<!-- Separator -->
-					<div class="flex items-center justify-center text-sm font-medium text-gray-400">VS</div>
-
-					<!-- Xet upload -->
-					<div class="shadow-xs rounded-xl border-2 border-indigo-200 dark:border-indigo-500/20 bg-white dark:bg-gray-900 p-5">
-						<p class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-							<span
-								class="bg-gradient-to-br mr-2 inline-block rounded-md from-indigo-100 to-purple-100 px-2 py-0.5 text-xs font-bold uppercase text-indigo-700"
-							>XET</span>
-							Deduplicated Upload
-						</p>
-						<div class="mb-2 flex gap-1">
-							<div class="h-6 flex-1 rounded bg-gray-100 dark:bg-gray-700"></div>
-							<div class="h-6 flex-1 rounded bg-gray-100 dark:bg-gray-700"></div>
-							<div class="h-6 flex-1 rounded bg-gray-100 dark:bg-gray-700"></div>
-							<div class="dedup-highlight h-6 flex-1 rounded bg-indigo-400 dark:bg-indigo-500"></div>
-							<div class="h-6 flex-1 rounded bg-gray-100 dark:bg-gray-700"></div>
-							<div class="h-6 flex-1 rounded bg-gray-100 dark:bg-gray-700"></div>
-							<div class="h-6 flex-1 rounded bg-gray-100 dark:bg-gray-700"></div>
-							<div class="h-6 flex-1 rounded bg-gray-100 dark:bg-gray-700"></div>
-						</div>
-						<p class="text-right font-mono text-sm font-medium text-indigo-600">
-							1 / 8 chunks uploaded
-						</p>
-					</div>
-
-					<!-- Annotation -->
-					<p class="text-center text-sm text-gray-500 dark:text-gray-400">
-						Gray = already stored &middot; Purple = only the changed chunk
-					</p>
-				</div>
-			</div>
-		</article></div></section>
-
-		<!-- ===================== PRICING ===================== -->
-		<section class="w-full border-b border-gray-200/50 dark:border-[#141c2e] px-4"><div class="w-full"><article
-			class="mx-auto max-w-7xl grid overflow-hidden border-l border-r border-gray-200/50 dark:border-[#141c2e] bg-white dark:bg-gray-950 lg:grid-cols-2"
-		>
-			<div class="p-8 sm:p-10 lg:p-14">
-				<span
-					class="text-sm mb-4 inline-block rounded-full bg-sky-100 dark:bg-sky-900/30 px-4 py-1 font-semibold text-sky-700 dark:text-sky-300"
-				>
-					Pricing
-				</span>
-				<h2 class="mb-6 text-balance text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">
-					Transparent, volume-based pricing
-				</h2>
-				<p class="mb-8 text-lg text-gray-600 dark:text-gray-400">
-					Simple per-TB pricing that scales with usage. Egress and CDN are included at no extra cost.
-				</p>
-
-				<!-- Comparison bars -->
-				<div class="space-y-2">
-					<!-- AWS S3 -->
-					<div class="flex items-center gap-4">
-						<div class="w-32 shrink-0 text-sm text-gray-600 dark:text-gray-400">AWS S3</div>
-						<div class="relative h-2.5 flex-1 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700">
-							<div
-								class="absolute inset-y-0 left-0 rounded-full bg-gray-300 dark:bg-gray-600"
-								style="width: 100%"
-							></div>
-						</div>
-						<div class="w-12 shrink-0 text-right text-sm font-semibold text-gray-500 dark:text-gray-400">$23</div>
-					</div>
-					<!-- Backblaze Overdrive -->
-					<div class="flex items-center gap-4">
-						<div class="w-32 shrink-0 text-sm text-gray-600 dark:text-gray-400">Backblaze Overdrive</div>
-						<div class="relative h-2.5 flex-1 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700">
-							<div
-								class="absolute inset-y-0 left-0 rounded-full bg-gray-300 dark:bg-gray-600"
-								style="width: 65.2%"
-							></div>
-						</div>
-						<div class="w-12 shrink-0 text-right text-sm font-semibold text-gray-500 dark:text-gray-400">$15</div>
-					</div>
-
-					<!-- HF Hub -->
-					<div class="flex items-center gap-4">
-						<div class="w-32 shrink-0 text-sm font-medium text-blue-600 dark:text-blue-400">HF Hub</div>
-						<div class="relative h-2.5 flex-1 overflow-hidden rounded-full bg-blue-100 dark:bg-gray-700">
-							<div
-								class="absolute inset-y-0 left-0 rounded-full bg-blue-200/50"
-								style="width: 52.2%"
-							></div>
-							<div
-								class="bg-gradient-to-r absolute inset-y-0 left-0 rounded-full from-blue-500 to-blue-400"
-								style="width: 34.8%"
-							></div>
-						</div>
-						<div class="w-12 shrink-0 text-right text-sm font-bold text-blue-600 dark:text-blue-400">
-							$8&ndash;12
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<!-- Pricing tiers (right column) -->
-			<div
-				class="bg-gradient-to-br flex items-center justify-center from-sky-50 to-cyan-50 dark:from-sky-950/20 dark:to-cyan-950/20 p-8 max-lg:order-2 lg:p-12"
-			>
-				<div class="grid w-full max-w-lg grid-cols-2 gap-3">
-					<!-- Base tier -->
-					<div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3">
-						<div class="mb-2 flex items-center gap-2">
-							<span class="text-sm font-medium text-gray-500 dark:text-gray-400">Base</span>
-						</div>
-						<div class="mb-0.5 flex items-baseline gap-1">
-							<span class="text-2xl font-bold text-gray-900 dark:text-white">$12</span>
-							<span class="text-sm text-gray-500 dark:text-gray-400">/TB/mo</span>
-						</div>
-						<div class="text-xs text-gray-400">Public repositories</div>
-						<div class="mt-3 border-t border-gray-200/50 dark:border-[#141c2e] dark:border-gray-800 pt-2">
-							<div class="flex items-baseline gap-1">
-								<span class="text-base font-semibold text-gray-700 dark:text-white">$18</span>
-								<span class="text-sm text-gray-400">/TB/mo</span>
-							</div>
-							<div class="text-xs text-gray-400">Private repositories</div>
-						</div>
-					</div>
-					<!-- 50TB+ tier -->
-					<div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3">
-						<div class="mb-2 flex items-center gap-2">
-							<span class="text-sm font-medium text-gray-500 dark:text-gray-400">50TB+</span>
-							<span class="rounded-full px-2 py-0.5 text-xs font-semibold bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400">20% off</span>
-						</div>
-						<div class="mb-0.5 flex items-baseline gap-1">
-							<span class="text-2xl font-bold text-gray-900 dark:text-white">$10</span>
-							<span class="text-sm text-gray-500 dark:text-gray-400">/TB/mo</span>
-						</div>
-						<div class="text-xs text-gray-400">Public repositories</div>
-						<div class="mt-3 border-t border-gray-200/50 dark:border-[#141c2e] dark:border-gray-800 pt-2">
-							<div class="flex items-baseline gap-1">
-								<span class="text-base font-semibold text-gray-700 dark:text-white">$16</span>
-								<span class="text-sm text-gray-400">/TB/mo</span>
-							</div>
-							<div class="text-xs text-gray-400">Private repositories</div>
-						</div>
-					</div>
-					<!-- 200TB+ tier -->
-					<div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3">
-						<div class="mb-2 flex items-center gap-2">
-							<span class="text-sm font-medium text-gray-500 dark:text-gray-400">200TB+</span>
-							<span class="rounded-full px-2 py-0.5 text-xs font-semibold bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400">25% off</span>
-						</div>
-						<div class="mb-0.5 flex items-baseline gap-1">
-							<span class="text-2xl font-bold text-gray-900 dark:text-white">$9</span>
-							<span class="text-sm text-gray-500 dark:text-gray-400">/TB/mo</span>
-						</div>
-						<div class="text-xs text-gray-400">Public repositories</div>
-						<div class="mt-3 border-t border-gray-200/50 dark:border-[#141c2e] dark:border-gray-800 pt-2">
-							<div class="flex items-baseline gap-1">
-								<span class="text-base font-semibold text-gray-700 dark:text-white">$14</span>
-								<span class="text-sm text-gray-400">/TB/mo</span>
-							</div>
-							<div class="text-xs text-gray-400">Private repositories</div>
-						</div>
-					</div>
-					<!-- 500TB+ tier -->
-					<div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3">
-						<div class="mb-2 flex items-center gap-2">
-							<span class="text-sm font-medium text-gray-500 dark:text-gray-400">500TB+</span>
-							<span class="rounded-full px-2 py-0.5 text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400">33% off</span>
-						</div>
-						<div class="mb-0.5 flex items-baseline gap-1">
-							<span class="text-2xl font-bold text-gray-900 dark:text-white">$8</span>
-							<span class="text-sm text-gray-500 dark:text-gray-400">/TB/mo</span>
-						</div>
-						<div class="text-xs text-gray-400">Public repositories</div>
-						<div class="mt-3 border-t border-gray-200/50 dark:border-[#141c2e] dark:border-gray-800 pt-2">
-							<div class="flex items-baseline gap-1">
-								<span class="text-base font-semibold text-gray-700 dark:text-white">$12</span>
-								<span class="text-sm text-gray-400">/TB/mo</span>
-							</div>
-							<div class="text-xs text-gray-400">Private repositories</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</article></div></section>
-
 		<!-- ============================================================ -->
-		<!-- USE CASE 1: Training Data (text left, visual right)          -->
+		<!-- SECTION: Storage (10x more) + Inference (20×) + Community      -->
 		<!-- ============================================================ -->
-		<section class="w-full border-b border-gray-200/50 dark:border-[#141c2e] px-4"><div class="w-full"><article
-			class="mx-auto max-w-7xl grid overflow-hidden border-l border-r border-gray-200/50 dark:border-[#141c2e] bg-white dark:bg-gray-950 lg:grid-cols-2"
-		>
-			<div class="p-8 sm:p-10 lg:p-14 max-lg:order-1 lg:order-2 lg:border-l lg:border-gray-200/50 dark:lg:border-[#141c2e]">
-				<span
-					class="text-sm mb-4 inline-block rounded-full bg-amber-100 dark:bg-amber-900/30 px-4 py-1 font-semibold text-amber-700 dark:text-amber-300"
-				>
-					Data Storage
-				</span>
-				<h2 class="mb-6 text-balance text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">
-					Assemble training data at any scale
-				</h2>
-				<p class="text-lg text-gray-600 dark:text-gray-400">
-					Pour raw data from every source into a single bucket: crawls, annotations, synthetic outputs, partner
-					datasets. No git overhead, no commit queues, no file-count limits. When training begins, your data is
-					already there, streamed to GPUs via the included CDN.
-				</p>
-				<ul class="mt-6 space-y-3 text-gray-600 dark:text-gray-300">
-					<li class="flex items-center gap-3">
-						<span class="flex size-5 flex-none items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400">
-							<svg class="size-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-							</svg>
-						</span>
-						<p class="text-sm sm:text-base">Immediate availability on upload, no queued commits</p>
-					</li>
-					<li class="flex items-center gap-3">
-						<span class="flex size-5 flex-none items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400">
-							<svg class="size-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-							</svg>
-						</span>
-						<p class="text-sm sm:text-base">Batch API processes thousands of files in a single call</p>
-					</li>
-					<li class="flex items-center gap-3">
-						<span class="flex size-5 flex-none items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400">
-							<svg class="size-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-							</svg>
-						</span>
-						<p class="text-sm sm:text-base">Raw + processed datasets with dedup = no double billing*</p>
-					</li>
-				</ul>
-				<p class="mt-4 text-xs text-gray-400">
-					*Requires <a href="/enterprise" class="underline underline-offset-2 hover:text-gray-600 dark:hover:text-gray-300">Enterprise or Enterprise Plus</a> plan
-				</p>
-			</div>
-			<!-- Visual: Bucket filling diagram -->
-			<div
-				class="bg-gradient-to-br relative flex items-center justify-center from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 p-8 max-lg:order-2 lg:p-12"
-			>
-				<div class="w-full max-w-lg space-y-3">
-					<!-- Simulated files flowing in -->
-					<div class="rounded-lg border border-amber-200/60 dark:border-amber-800/20 bg-white/80 dark:bg-gray-900/80 px-4 py-3">
-						<div class="flex items-center gap-3">
-							<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400">
-								<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-									<path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-								</svg>
-							</div>
-							<div class="min-w-0 flex-1">
-								<p class="truncate text-sm font-medium text-gray-900 dark:text-white">crawl-2026-jan/</p>
-								<p class="text-xs text-gray-500 dark:text-gray-400">48 TB &middot; 2.1M files</p>
-							</div>
-							<span class="rounded-full bg-green-100 dark:bg-green-900/30 px-2 py-0.5 text-xs font-medium text-green-700 dark:text-green-400">synced</span>
-						</div>
+		<section class="w-full border-b border-gray-200/50 dark:border-[#141c2e] px-4">
+			<article class="mx-auto max-w-7xl divide-y divide-gray-200/50 dark:divide-[#141c2e] overflow-hidden border-l border-r border-gray-200/50 dark:border-[#141c2e] bg-white dark:bg-gray-950">
+
+				<!-- Grid 1: Storage -->
+				<div class="grid divide-gray-200/50 dark:divide-[#141c2e] max-lg:divide-y lg:grid-cols-2 lg:divide-x">
+					<div class="p-8 sm:p-10 lg:p-14">
+						<span class="text-sm mb-4 inline-block rounded-full bg-blue-400/10 px-4 py-1 font-semibold text-blue-600 dark:bg-blue-600/10 dark:text-blue-500">Storage</span>
+						<h2 class="mb-6 text-balance text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">Get 10x more Storage</h2>
+						<p class="mb-8 text-lg text-gray-600 dark:text-gray-400">
+							Every model, dataset, and <a href="/storage" target="_blank" class="font-medium text-blue-600 hover:underline dark:text-blue-400">Storage Bucket</a> on the Hugging Face Hub gets fast, reliable storage that grows with your projects.
+							<br><br>
+							Hugging Face PRO bumps your private storage to <strong class="text-gray-900 dark:text-gray-200">1 TB</strong> and doubles your public limit to <strong class="text-gray-900 dark:text-gray-200">10 TB</strong>.
+						</p>
 					</div>
-					<div class="rounded-lg border border-amber-200/60 dark:border-amber-800/20 bg-white/80 dark:bg-gray-900/80 px-4 py-3">
-						<div class="flex items-center gap-3">
-							<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400">
-								<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-									<path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-								</svg>
-							</div>
-							<div class="min-w-0 flex-1">
-								<p class="truncate text-sm font-medium text-gray-900 dark:text-white">annotations-v3/</p>
-								<p class="text-xs text-gray-500 dark:text-gray-400">12 TB &middot; 890K files</p>
-							</div>
-							<span class="rounded-full bg-green-100 dark:bg-green-900/30 px-2 py-0.5 text-xs font-medium text-green-700 dark:text-green-400">synced</span>
-						</div>
-					</div>
-					<div class="rounded-lg border border-amber-200/60 dark:border-amber-800/20 bg-white/80 dark:bg-gray-900/80 px-4 py-3">
-						<div class="flex items-center gap-3">
-							<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400">
-								<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-									<path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-								</svg>
-							</div>
-							<div class="min-w-0 flex-1">
-								<p class="truncate text-sm font-medium text-gray-900 dark:text-white">synthetic-pairs/</p>
-								<p class="text-xs text-gray-500 dark:text-gray-400">6 TB &middot; 340K files</p>
-							</div>
-							<div class="flex items-center gap-2">
-								<div class="h-1.5 w-16 rounded-full bg-gray-200 dark:bg-gray-700">
-									<div class="h-full w-3/4 rounded-full bg-blue-500"></div>
+					<div class="relative flex items-center justify-center overflow-hidden bg-blue-50/40 p-8 dark:bg-blue-950/10 lg:p-14">
+						<div class="w-full max-w-sm space-y-6">
+							<!-- Private Storage -->
+							<div>
+								<p class="mb-2 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Private Storage</p>
+								<div class="space-y-2">
+									<div class="flex items-center gap-3">
+										<span class="w-10 shrink-0 rounded bg-gray-200 px-1.5 py-0.5 text-center text-[10px] font-bold text-gray-500 dark:bg-gray-700 dark:text-gray-400">Free</span>
+										<div class="flex-1 h-3 rounded-full bg-gray-200 dark:bg-gray-700"><div class="h-3 rounded-full bg-gray-400 dark:bg-gray-500" style="width: 10%;"></div></div>
+										<span class="text-xs font-semibold text-gray-500 dark:text-gray-400">100 GB</span>
+									</div>
+									<div class="flex items-center gap-3">
+										<span class="w-10 shrink-0 rounded px-1.5 py-0.5 text-center text-[10px] font-bold text-black" style="background: linear-gradient(151deg, #F6339A 15%, #00BC7D 50%, #FE9A00 100%);">PRO</span>
+										<div class="flex-1 h-3 rounded-full bg-gray-200 dark:bg-gray-700"><div class="h-3 rounded-full bg-blue-500" style="width: 100%;"></div></div>
+										<span class="text-xs font-semibold text-gray-900 dark:text-white">1 TB</span>
+									</div>
 								</div>
-								<span class="text-xs font-medium text-blue-600 dark:text-blue-400">75%</span>
+							</div>
+							<!-- Public Storage -->
+							<div>
+								<p class="mb-2 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Public Storage</p>
+								<div class="space-y-2">
+									<div class="flex items-center gap-3">
+										<span class="w-10 shrink-0 rounded bg-gray-200 px-1.5 py-0.5 text-center text-[10px] font-bold text-gray-500 dark:bg-gray-700 dark:text-gray-400">Free</span>
+										<div class="flex-1 h-3 rounded-full bg-gray-200 dark:bg-gray-700"><div class="h-3 rounded-full bg-gray-400 dark:bg-gray-500" style="width: 50%;"></div></div>
+										<span class="text-xs font-semibold text-gray-500 dark:text-gray-400">~5 TB</span>
+									</div>
+									<div class="flex items-center gap-3">
+										<span class="w-10 shrink-0 rounded px-1.5 py-0.5 text-center text-[10px] font-bold text-black" style="background: linear-gradient(151deg, #F6339A 15%, #00BC7D 50%, #FE9A00 100%);">PRO</span>
+										<div class="flex-1 h-3 rounded-full bg-gray-200 dark:bg-gray-700"><div class="h-3 rounded-full bg-blue-500" style="width: 100%;"></div></div>
+										<span class="text-xs font-semibold text-gray-900 dark:text-white">10 TB</span>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
-					<!-- Dedup savings callout -->
-					<div class="bg-green-50/80 dark:bg-green-950/30 mt-4 rounded-xl border border-dashed border-green-300 dark:border-green-800 px-4 py-3">
-						<div class="flex items-center gap-2">
-							<svg class="h-4 w-4 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-							</svg>
-							<p class="text-sm font-medium text-green-700 dark:text-green-400">
-								Xet dedup: 66 TB stored &rarr; billed for 41 TB*
-							</p>
-						</div>
-					</div>
 				</div>
-			</div>
-		</article></div></section>
 
-		<!-- ============================================================ -->
-		<!-- USE CASE 4: CDN & Pre-warming                                -->
-		<!-- ============================================================ -->
-		<section class="w-full border-b border-gray-200/50 dark:border-[#141c2e] px-4"><div class="w-full"><article
-			class="mx-auto max-w-7xl grid overflow-hidden border-l border-r border-gray-200/50 dark:border-[#141c2e] bg-white dark:bg-gray-950 lg:grid-cols-2"
-		>
-			<div class="p-8 sm:p-10 lg:p-14">
-				<span
-					class="text-sm mb-4 inline-block rounded-full bg-teal-100 dark:bg-teal-900/30 px-4 py-1 font-semibold text-teal-700 dark:text-teal-300"
-				>
-					CDN
-				</span>
-				<h2 class="mb-6 text-balance text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">
-					Built-in CDN for blazing fast access
-				</h2>
-				<p class="text-lg text-gray-600 dark:text-gray-400">
-					Every bucket includes a CDN. Warm localized cache close to where you compute for ultra fast streaming and
-					downloads. Egress is included up to a generous 8:1 ratio of your total storage.
-				</p>
-				<ul class="mt-6 space-y-3 text-gray-600 dark:text-gray-300">
-					<li class="flex items-center gap-3">
-						<span class="flex size-5 flex-none items-center justify-center rounded-full bg-teal-100 dark:bg-teal-900/40 text-teal-600 dark:text-teal-400">
-							<svg class="size-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-							</svg>
-						</span>
-						<p class="text-sm sm:text-base">Pre-warm cache in any cloud region you need</p>
-					</li>
-					<li class="flex items-center gap-3">
-						<span class="flex size-5 flex-none items-center justify-center rounded-full bg-teal-100 dark:bg-teal-900/40 text-teal-600 dark:text-teal-400">
-							<svg class="size-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-							</svg>
-						</span>
-						<p class="text-sm sm:text-base">Our CDN is deployed inside GCP and AWS networks</p>
-					</li>
-					<li class="flex items-center gap-3">
-						<span class="flex size-5 flex-none items-center justify-center rounded-full bg-teal-100 dark:bg-teal-900/40 text-teal-600 dark:text-teal-400">
-							<svg class="size-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-							</svg>
-						</span>
-						<p class="text-sm sm:text-base">Egress included up to 8:1 your storage</p>
-					</li>
-				</ul>
-				<div class="mt-6 flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
-					<i class="fa-brands fa-google text-3xl"></i>
-					<i class="fa-brands fa-aws text-3xl"></i>
-					<span class="text-sm">More providers coming soon</span>
-				</div>
-			</div>
-			<div
-				class="bg-gradient-to-br relative flex items-center justify-center from-teal-50 to-emerald-50 dark:from-teal-950/20 dark:to-emerald-950/20 p-8 max-lg:order-2 lg:p-12"
-			>
-				<div class="flex items-center justify-center">
-					<svg
-						viewBox="0 0 400 400"
-						class="sm:size-92 size-72 drop-shadow-xl"
-						fill="none"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						<defs>
-							<radialGradient id="globe-shading" cx="30%" cy="30%" r="70%">
-								<stop offset="0%" stop-color="#fff" stop-opacity="0.08" />
-								<stop offset="35%" stop-color="#fff" stop-opacity="0" />
-								<stop offset="70%" stop-color="#000" stop-opacity="0.15" />
-								<stop offset="100%" stop-color="#000" stop-opacity="0.4" />
-							</radialGradient>
-							<filter id="glow-intense" x="-50%" y="-50%" width="200%" height="200%">
-								<feGaussianBlur stdDeviation="4" result="blur" />
-								<feComposite in="SourceGraphic" in2="blur" operator="over" />
-							</filter>
-							<filter id="glow-soft" x="-30%" y="-30%" width="160%" height="160%">
-								<feGaussianBlur stdDeviation="15" result="blur" />
-								<feComposite in="SourceGraphic" in2="blur" operator="over" />
-							</filter>
-						</defs>
-
-						<!-- Outer Atmospheric Glow -->
-						<circle cx="200" cy="200" r="160" fill="currentColor" class="text-teal-400/20" filter="url(#glow-soft)" />
-
-						<!-- Orbit Ring 1 (Back Half) -->
-						<g transform="rotate(-15 200 200)">
-							<path d="M 10 200 A 190 60 0 0 1 390 200" stroke="currentColor" class="text-teal-400/30" stroke-width="1.5" />
-						</g>
-						<g transform="rotate(45 200 200)" />
-
-						<!-- Solid Base Sphere -->
-						<circle cx="200" cy="200" r="150" fill="currentColor" class="text-teal-50 dark:text-[#061926]" />
-
-						<!-- Back Graticules -->
-						<g stroke="currentColor" class="text-teal-700/10" stroke-width="1">
-							<path d="M 50 200 A 150 45 0 0 1 350 200" />
-							<path d="M 73 120 A 127 35 0 0 1 327 120" />
-							<path d="M 73 280 A 127 35 0 0 1 327 280" />
-							<path d="M 200 50 L 200 350" />
-							<path d="M 200 50 A 50 150 0 0 1 200 350" />
-							<path d="M 200 50 A 100 150 0 0 1 200 350" />
-						</g>
-
-						<!-- 3D Shading Overlay -->
-						<circle cx="200" cy="200" r="150" fill="url(#globe-shading)" />
-
-						<!-- Front Graticules -->
-						<g stroke="currentColor" class="text-teal-600/40" stroke-width="1.5">
-							<path d="M 50 200 A 150 45 0 0 0 350 200" />
-							<path d="M 73 120 A 127 35 0 0 0 327 120" />
-							<path d="M 73 280 A 127 35 0 0 0 327 280" />
-							<path d="M 200 50 A 50 150 0 0 0 200 350" />
-							<path d="M 200 50 A 100 150 0 0 0 200 350" />
-							<path d="M 200 50 A 148 150 0 0 0 200 350" />
-							<path d="M 200 50 A 148 150 0 0 1 200 350" />
-						</g>
-
-						<!-- Orbit Ring 1 (Front Half) -->
-						<g transform="rotate(-15 200 200)">
-							<path d="M 10 200 A 190 60 0 0 0 390 200" stroke="currentColor" class="text-teal-500/60" stroke-width="2" />
-						</g>
-						<g transform="rotate(45 200 200)" />
-
-						<!-- Surface Drop Shadows -->
-						<g fill="currentColor" class="text-teal-900/20" filter="url(#glow-soft)">
-							<ellipse cx="110" cy="140" rx="12" ry="4" />
-							<ellipse cx="240" cy="110" rx="12" ry="4" />
-							<ellipse cx="310" cy="180" rx="12" ry="4" />
-							<ellipse cx="160" cy="260" rx="12" ry="4" />
-						</g>
-
-						<!-- High Arcing Data Connections -->
-						<g fill="none" stroke-width="2.5" stroke-linecap="round">
-							<path d="M 110 130 C 120 70, 210 60, 240 100" stroke="currentColor" class="text-teal-400/30" />
-							<path d="M 240 100 C 280 80, 315 120, 310 170" stroke="currentColor" class="text-teal-400/30" />
-							<path d="M 110 130 C 70 170, 100 240, 160 250" stroke="currentColor" class="text-teal-400/30" />
-						</g>
-
-						<!-- Floating Edge Nodes -->
-						<!-- US East -->
-						<g class="node-float" style="animation-delay: 0s">
-							<g transform="translate(110, 130)">
-								<circle cx="0" cy="0" r="8" fill="currentColor" class="text-teal-400" filter="url(#glow-intense)" />
-								<circle cx="0" cy="0" r="4" fill="#fff" />
-								<circle cx="0" cy="0" r="2" fill="currentColor" class="text-teal-500" />
-								<rect x="-32" y="-40" width="64" height="18" rx="4" fill="currentColor" class="text-white/90" />
-								<text x="0" y="-28" text-anchor="middle" font-size="9" font-weight="800" font-family="monospace" fill="currentColor" class="text-teal-800">US-EAST</text>
-							</g>
-						</g>
-
-						<!-- EU West -->
-						<g class="node-float" style="animation-delay: 0.5s">
-							<g transform="translate(240, 100)">
-								<circle cx="0" cy="0" r="8" fill="currentColor" class="text-teal-400" filter="url(#glow-intense)" />
-								<circle cx="0" cy="0" r="4" fill="#fff" />
-								<circle cx="0" cy="0" r="2" fill="currentColor" class="text-teal-500" />
-								<rect x="-32" y="-40" width="64" height="18" rx="4" fill="currentColor" class="text-white/90" />
-								<text x="0" y="-28" text-anchor="middle" font-size="9" font-weight="800" font-family="monospace" fill="currentColor" class="text-teal-800">EU-WEST</text>
-							</g>
-						</g>
-
-						<!-- Asia -->
-						<g class="node-float" style="animation-delay: 1s">
-							<g transform="translate(310, 170)">
-								<circle cx="0" cy="0" r="8" fill="currentColor" class="text-teal-400" filter="url(#glow-intense)" />
-								<circle cx="0" cy="0" r="4" fill="#fff" />
-								<circle cx="0" cy="0" r="2" fill="currentColor" class="text-teal-500" />
-								<rect x="-24" y="22" width="48" height="18" rx="4" fill="currentColor" class="text-white/90" />
-								<text x="0" y="34" text-anchor="middle" font-size="9" font-weight="800" font-family="monospace" fill="currentColor" class="text-teal-800">ASIA</text>
-							</g>
-						</g>
-
-						<!-- SA East -->
-						<g class="node-float" style="animation-delay: 1.5s">
-							<g transform="translate(160, 250)">
-								<circle cx="0" cy="0" r="8" fill="currentColor" class="text-teal-400" filter="url(#glow-intense)" />
-								<circle cx="0" cy="0" r="4" fill="#fff" />
-								<circle cx="0" cy="0" r="2" fill="currentColor" class="text-teal-500" />
-								<rect x="-32" y="22" width="64" height="18" rx="4" fill="currentColor" class="text-white/90" />
-								<text x="0" y="34" text-anchor="middle" font-size="9" font-weight="800" font-family="monospace" fill="currentColor" class="text-teal-800">SA-EAST</text>
-							</g>
-						</g>
-					</svg>
-				</div>
-			</div>
-		</article></div></section>
-
-		<!-- ============================================================ -->
-		<!-- USE CASE 2: Coding Agents (text left, terminal right)        -->
-		<!-- ============================================================ -->
-		<section class="w-full border-b border-gray-200/50 dark:border-[#141c2e] px-4"><div class="w-full"><article
-			class="mx-auto max-w-7xl grid overflow-hidden border-l border-r border-gray-200/50 dark:border-[#141c2e] bg-white dark:bg-gray-950 lg:grid-cols-2"
-		>
-			<div class="p-8 sm:p-10 lg:p-14 max-lg:order-1 lg:order-2 lg:border-l lg:border-gray-200/50 dark:lg:border-[#141c2e]">
-				<span
-					class="text-sm mb-4 inline-block rounded-full bg-violet-100 dark:bg-violet-900/30 px-4 py-1 font-semibold text-violet-700 dark:text-violet-300"
-				>
-					Coding Agents
-				</span>
-				<h2 class="mb-6 text-balance text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">
-					Give your coding agents persistent storage
-				</h2>
-				<p class="text-lg text-gray-600 dark:text-gray-400">
-					Coding agents run in ephemeral environments, but their outputs shouldn't vanish. Checkpoints, benchmark
-					results, generated datasets: one <code class="rounded bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 font-mono text-sm">hf sync</code>
-					command in your agent's bash tool is all it takes.
-				</p>
-				<ul class="mt-6 space-y-3 text-gray-600 dark:text-gray-300">
-					<li class="flex items-center gap-3">
-						<span class="flex size-5 flex-none items-center justify-center rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-400">
-							<svg class="size-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-							</svg>
-						</span>
-						<p class="text-sm sm:text-base">Pre-warmed CDN and no git overhead for fast reads and writes</p>
-					</li>
-					<li class="flex items-center gap-3">
-						<span class="flex size-5 flex-none items-center justify-center rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-400">
-							<svg class="size-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-							</svg>
-						</span>
-						<p class="text-sm sm:text-base">Persist artifacts across ephemeral CI runs and terminal sessions</p>
-					</li>
-					<li class="flex items-center gap-3">
-						<span class="flex size-5 flex-none items-center justify-center rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-400">
-							<svg class="size-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-							</svg>
-						</span>
-						<p class="text-sm sm:text-base">
-							Install the official <a
-								href="https://huggingface.co/docs/hub/en/agents-cli"
-								class="underline hover:text-violet-600 dark:hover:text-gray-300"
-							>HF CLI skill</a> and your agent knows every command
+				<!-- Grid 2: Inference -->
+				<div class="grid divide-gray-200/50 dark:divide-[#141c2e] max-lg:divide-y lg:grid-cols-2 lg:divide-x">
+					<div class="p-8 sm:p-10 lg:p-14">
+						<span class="text-sm mb-4 inline-block rounded-full bg-amber-400/10 px-4 py-1 font-semibold text-amber-600 dark:bg-amber-600/10 dark:text-amber-600">Inference Providers</span>
+						<h2 class="mb-6 text-balance text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">Get 20× more Inference Usage</h2>
+						<p class="mb-8 text-lg text-gray-600 dark:text-gray-400">
+							<a href="/docs/inference-providers" target="_blank" class="font-medium text-orange-600 hover:underline dark:text-orange-400">Inference Providers</a> let you easily run inference on 10k+ models, while staying in control. You can manage API keys and sort your favorite providers without leaving the Hub.
+							<br><br>
+							Hugging Face PRO provides <strong class="text-gray-900 dark:text-gray-200">20× more monthly inference usage</strong>, with additional pay-as-you-go option once your limit is reached.
 						</p>
-					</li>
-				</ul>
-			</div>
-			<div
-				class="bg-gradient-to-br relative flex items-center justify-center from-violet-50 to-indigo-50 dark:from-violet-950/20 dark:to-indigo-950/20 p-8 max-lg:order-2 lg:p-12"
-			>
-				<div class="w-full max-w-xl">
-					<div class="shadow-xs overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/50">
-						<div class="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/60 px-4 py-2.5">
-							<span class="h-3 w-3 rounded-full bg-red-400"></span>
-							<span class="h-3 w-3 rounded-full bg-yellow-400"></span>
-							<span class="h-3 w-3 rounded-full bg-green-400"></span>
-							<span class="flex-1 text-center font-mono text-xs text-gray-500 dark:text-gray-400">terminal - bash</span>
-						</div>
-						<div class="overflow-x-auto p-4 font-mono text-[11px] leading-relaxed text-gray-700 dark:text-gray-200 sm:p-6 sm:text-[12px]">
-							<div class="mb-3 text-gray-500 dark:text-gray-400">
-								# Agent creates a bucket and syncs experiment outputs
+					</div>
+					<div class="relative flex items-center justify-center overflow-hidden bg-amber-50/30 p-8 pb-14 dark:bg-amber-950/10 lg:p-14">
+						<div class="w-full max-w-sm space-y-4">
+							<!-- Free Account -->
+							<div class="rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-900">
+								<p class="mb-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Free Account</p>
+								<div class="flex items-center gap-3">
+									<div class="flex-1 h-3 rounded-full bg-gray-200 dark:bg-gray-700"><div class="h-3 rounded-full bg-gray-400 dark:bg-gray-500" style="width: 5%;"></div></div>
+									<span class="text-xs font-semibold text-gray-500 dark:text-gray-400">100k</span>
+								</div>
 							</div>
-
-							<div class="mb-1">
-								<span class="text-green-600 dark:text-green-300">&#9679;</span>
-								<span class="font-semibold text-gray-900 dark:text-white"> Bash(</span><span class="text-gray-900 dark:text-white">hf buckets create training-artifacts-v2</span><span class="font-semibold text-gray-900 dark:text-white">)</span>
+							<div class="text-center text-sm font-medium text-gray-400">vs</div>
+							<!-- PRO Account -->
+							<div class="rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-900">
+								<div class="mb-3 flex items-center gap-2">
+									<span class="rounded px-1.5 py-0.5 text-[10px] font-bold text-black" style="background: linear-gradient(151deg, #F6339A 15%, #00BC7D 50%, #FE9A00 100%);">PRO</span>
+									<span class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Account</span>
+								</div>
+								<div class="flex items-center gap-3">
+									<div class="flex-1 h-3 rounded-full bg-gray-200 dark:bg-gray-700"><div class="h-3 rounded-full bg-amber-500" style="width: 100%;"></div></div>
+									<span class="text-xs font-semibold text-gray-900 dark:text-white">2M</span>
+								</div>
 							</div>
-							<div class="mb-4 pl-3 text-gray-500 dark:text-gray-400">
-								&#9492; Bucket created: <span class="text-violet-700 dark:text-violet-300">hf://buckets/acme/training-artifacts-v2</span>
-							</div>
-
-							<div class="mb-1">
-								<span class="text-green-600 dark:text-green-300">&#9679;</span>
-								<span class="font-semibold text-gray-900 dark:text-white"> Bash(</span><span class="text-gray-900 dark:text-white">hf buckets sync ./experiment_outputs/ hf://buckets/acme/training-artifacts-v2</span><span class="font-semibold text-gray-900 dark:text-white">)</span>
-							</div>
-							<div class="mb-0.5 pl-3 text-gray-500 dark:text-gray-400">
-								&#9492; Sync plan: ./experiment_outputs/ &#8594; <span class="text-violet-700 dark:text-violet-300">hf://buckets/acme/training-artifacts-v2</span>
-							</div>
-							<div class="mb-0.5 pl-7 text-gray-500 dark:text-gray-400">
-								Uploads: <span class="text-gray-900 dark:text-white">16</span>
-							</div>
-							<div class="mb-4 pl-7 text-gray-500 dark:text-gray-400">
-								Downloads: <span class="text-gray-900 dark:text-white">0</span>
-							</div>
-
-							<div class="mb-1">
-								<span class="text-green-600 dark:text-green-300">&#9679;</span>
-								<span class="text-gray-900 dark:text-white"> All done.</span>
-								<span class="text-gray-500 dark:text-gray-400">
-									Bucket acme/training-artifacts-v2 synced (14.3 GB total):</span>
-							</div>
-							<div class="mb-0.5 pl-3 text-gray-500 dark:text-gray-400">
-								- 3 checkpoints (model.safetensors, optimizer.pt, config.json)
-							</div>
-							<div class="mb-0.5 pl-3 text-gray-500 dark:text-gray-400">
-								- 6 parquet shards (data/train/ and data/eval/)
-							</div>
-							<div class="mb-3 pl-3 text-gray-500 dark:text-gray-400">- 1 training log</div>
-
-							<div class="text-gray-500 dark:text-gray-400">
-								Bucket is live at <span class="text-violet-700 dark:text-violet-300">hf://buckets/acme/training-artifacts-v2</span>
-							</div>
+							<p class="text-center text-xs text-gray-500 dark:text-gray-400">Already+15 providers available!</p>
 						</div>
 					</div>
 				</div>
-			</div>
-		</article></div></section>
+
+				<!-- Grid 3: Community -->
+				<div class="grid divide-gray-200/50 dark:divide-[#141c2e] max-lg:divide-y lg:grid-cols-2 lg:divide-x">
+					<div class="p-8 sm:p-10 lg:p-14">
+						<span class="text-sm mb-4 inline-block rounded-full bg-pink-400/10 px-4 py-1 font-semibold text-pink-500 dark:bg-pink-700/10 dark:text-pink-600">Community</span>
+						<h2 class="mb-6 text-balance text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">Share your AI Journey</h2>
+						<p class="mb-8 text-lg text-gray-600 dark:text-gray-400">
+							The Hugging Face Hub is the central place to connect with the AI community, where AI builders and researchers share their work and build their profiles.
+							<br><br>
+							Hugging Face PRO lets you showcase your work by <strong class="text-gray-900 dark:text-gray-200">writing and hosting Articles</strong> directly visible on the Hub and features an exclusive <strong class="text-gray-900 dark:text-gray-200">PRO badge</strong> on your profile.
+						</p>
+					</div>
+					<div class="relative flex items-center justify-center overflow-hidden bg-pink-50/40 p-8 dark:bg-pink-950/10 lg:p-14">
+						<div class="flex flex-col items-center gap-4 text-center">
+							<!-- PRO badge demo -->
+							<div class="relative h-20 w-20 rounded-full p-[3px]" style="background: linear-gradient(135deg, rgba(246,51,154,0.7), rgba(0,188,125,0.7), rgba(254,154,0,0.7));">
+								<div class="flex h-full w-full items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
+									<span class="text-2xl">🤗</span>
+								</div>
+							</div>
+							<span class="inline-flex -skew-x-12 items-center rounded-md border border-[#141c2e] px-2 py-0.5 text-xs font-bold text-black" style="background: linear-gradient(151deg, #F6339A 0%, #00BC7D 50%, #FE9A00 100%);">PRO</span>
+							<p class="text-sm text-gray-500 dark:text-gray-400">Show your support for Hugging Face<br>and open source AI</p>
+						</div>
+					</div>
+				</div>
+
+			</article>
+		</section>
 
 		<!-- Spacer -->
 		<section class="w-full border-b border-gray-200/50 dark:border-[#141c2e] px-4"><div class="mx-auto h-16 max-w-7xl border-l border-r border-gray-200/50 dark:border-[#141c2e]"></div></section>
 
 		<!-- ============================================================ -->
-		<!-- Security & Compliance — v3 card layout (from reference)       -->
+		<!-- SECTION: Premium Perks                                        -->
 		<!-- ============================================================ -->
-		<style>
-			@keyframes shield-pulse {
-				0%, 100% { transform: scale(1); opacity: 1; }
-				50% { transform: scale(1.04); opacity: 0.7; }
-			}
-			.shield-ring { animation: shield-pulse 3s ease-in-out infinite; }
-		</style>
-		<section class="w-full px-4">
-			<article class="relative mx-auto max-w-7xl overflow-hidden border-l border-r border-[#141c2e] dark:bg-gray-950">
-				<!-- Top area: shield icon + heading -->
-				<div class="relative z-10 flex flex-col items-center justify-center overflow-hidden px-8 pb-8 pt-12 sm:pt-16">
-					<div class="relative flex items-center justify-center">
-						<!-- Animated shield rings -->
-						<span class="shield-ring absolute size-28 rounded-full border border-blue-700/30" style="animation-delay: 0s"></span>
-						<span class="shield-ring absolute size-44 rounded-full border border-blue-700/20" style="animation-delay: 1s"></span>
-						<span class="shield-ring absolute size-60 rounded-full border border-blue-800/15" style="animation-delay: 2s"></span>
-						<!-- Bucket icon -->
-						<div class="relative flex flex-col items-center">
-							<svg class="size-16 text-blue-500" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 48 48" fill="none">
-								<path opacity="0.25" d="M36 4H12C7.58172 4 4 7.58172 4 12V36C4 40.4183 7.58172 44 12 44H36C40.4183 44 44 40.4183 44 36V12C44 7.58172 40.4183 4 36 4Z" fill="currentColor"/>
-								<path opacity="0.5" d="M31 11H17C13.6863 11 11 13.6863 11 17V31C11 34.3137 13.6863 37 17 37H31C34.3137 37 37 34.3137 37 31V17C37 13.6863 34.3137 11 31 11Z" fill="currentColor"/>
-								<path d="M27 18H21C19.3431 18 18 19.3431 18 21V27C18 28.6569 19.3431 30 21 30H27C28.6569 30 30 28.6569 30 27V21C30 19.3431 28.6569 18 27 18Z" fill="currentColor"/>
-							</svg>
+		<section class="w-full border-b border-gray-200/50 dark:border-[#141c2e] px-4">
+			<article class="relative mx-auto max-w-7xl overflow-hidden border-l border-r border-gray-200/50 dark:border-[#141c2e] bg-white dark:bg-gray-950 px-8 pt-12 pb-14 sm:px-12 sm:pt-16">
+				<h2 class="mb-10 text-center text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">Access more Premium Perks</h2>
+				<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+					<!-- Perk 1 -->
+					<div class="rounded-2xl border border-gray-200 bg-gray-50 p-6 dark:border-gray-800 dark:bg-gray-900">
+						<div class="mb-3 flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500/25 to-cyan-500/25">
+							<svg class="size-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125"/></svg>
 						</div>
+						<h3 class="mb-1 text-base font-semibold text-gray-900 dark:text-white">Public Storage Add-ons</h3>
+						<p class="text-sm text-gray-500 dark:text-gray-400">Purchase additional tiers starting at $12/TB/month</p>
 					</div>
-					<p class="mt-6 text-center text-lg text-gray-400 sm:text-xl">Enterprise-grade security at every layer</p>
-				</div>
-
-				<!-- 4-column feature grid -->
-				<div class="relative z-10 grid grid-cols-2 border-t border-[#141c2e] lg:grid-cols-4">
-					<!-- AES-256 Encryption -->
-					<div class="flex flex-col items-center border-b border-r border-[#141c2e] p-6 text-center sm:p-8 lg:border-b-0">
-						<svg class="size-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32"><path fill="currentColor" d="M24 14h-2V8a6 6 0 0 0-12 0v6H8a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V16a2 2 0 0 0-2-2ZM12 8a4 4 0 0 1 8 0v6h-8Zm12 20H8V16h16Z"/></svg>
-						<h3 class="mb-1 mt-3 text-sm font-semibold text-white">AES-256 Encryption</h3>
-						<span class="text-xs leading-relaxed text-gray-400">End-to-end encryption at rest and in transit</span>
+					<!-- Perk 2 -->
+					<div class="rounded-2xl border border-gray-200 bg-gray-50 p-6 dark:border-gray-800 dark:bg-gray-900">
+						<div class="mb-3 flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500/25 to-purple-500/25">
+							<svg class="size-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+						</div>
+						<h3 class="mb-1 text-base font-semibold text-gray-900 dark:text-white">Private Dataset Viewer</h3>
+						<p class="text-sm text-gray-500 dark:text-gray-400">Activate the Dataset Viewer on private datasets to explore your data safely</p>
 					</div>
-					<!-- Audit Logs -->
-					<div class="flex flex-col items-center border-b border-[#141c2e] p-6 text-center sm:p-8 lg:border-b-0 lg:border-r">
-						<svg class="size-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32"><path fill="currentColor" d="M10 18h8v2h-8zm0-5h12v2H10zm0 10h5v2h-5z"/><path fill="currentColor" d="M25 5h-3V4a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v1H7a2 2 0 0 0-2 2v21a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2ZM12 4h8v4h-8Zm13 24H7V7h3v3h12V7h3Z"/></svg>
-						<h3 class="mb-1 mt-3 text-sm font-semibold text-white">Audit Logs</h3>
-						<span class="text-xs leading-relaxed text-gray-400">Full visibility into every access event</span>
+					<!-- Perk 3 -->
+					<div class="rounded-2xl border border-gray-200 bg-gray-50 p-6 dark:border-gray-800 dark:bg-gray-900">
+						<div class="mb-3 flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500/25 to-teal-500/25">
+							<svg class="size-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z"/></svg>
+						</div>
+						<h3 class="mb-1 text-base font-semibold text-gray-900 dark:text-white">Early Feature Access</h3>
+						<p class="text-sm text-gray-500 dark:text-gray-400">Be among the first to try new features and stay ahead with the latest in open source AI</p>
 					</div>
-					<!-- SSO & RBAC -->
-					<div class="flex flex-col items-center border-r border-[#141c2e] p-6 text-center sm:p-8">
-						<svg class="size-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32"><path fill="currentColor" d="M31 30h-2v-3a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3v3h-2v-3a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5z"/><path fill="currentColor" d="M24 12a3 3 0 1 1-3 3a3 3 0 0 1 3-3m0-2a5 5 0 1 0 5 5a5 5 0 0 0-5-5z"/><path fill="currentColor" d="M15 22h-2v-3a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v3H1v-3a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5z"/><path fill="currentColor" d="M8 4a3 3 0 1 1-3 3a3 3 0 0 1 3-3m0-2a5 5 0 1 0 5 5a5 5 0 0 0-5-5z"/></svg>
-						<h3 class="mb-1 mt-3 text-sm font-semibold text-white">SSO &amp; RBAC</h3>
-						<span class="text-xs leading-relaxed text-gray-400">Enterprise SSO with role-based access control</span>
+					<!-- Perk 4 -->
+					<div class="rounded-2xl border border-gray-200 bg-gray-50 p-6 dark:border-gray-800 dark:bg-gray-900">
+						<div class="mb-3 flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-pink-500/25 via-green-500/25 to-yellow-500/25">
+							<svg class="size-5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.745 3.745 0 011.043 3.296A3.745 3.745 0 0121 12z"/></svg>
+						</div>
+						<h3 class="mb-1 text-base font-semibold text-gray-900 dark:text-white">Exclusive PRO Badge</h3>
+						<p class="text-sm text-gray-500 dark:text-gray-400">Show your support for Hugging Face and open source AI with a PRO badge on your profile</p>
 					</div>
-					<!-- US & EU Regions -->
-					<div class="flex flex-col items-center p-6 text-center sm:p-8">
-						<svg class="size-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 32 32"><path fill="currentColor" d="M16 2a14 14 0 1 0 14 14A14.016 14.016 0 0 0 16 2Zm10.1 8h-4.4a18.82 18.82 0 0 0-2.85-6.36A12.03 12.03 0 0 1 26.1 10ZM16 4a11 11 0 0 1 1.615.118A14.7 14.7 0 0 1 21.08 10H10.92a14.7 14.7 0 0 1 3.465-5.882A11 11 0 0 1 16 4Zm-2.85-.36A18.82 18.82 0 0 0 10.3 10H5.9a12.03 12.03 0 0 1 7.25-6.36ZM4.551 12.5H9.28a20.2 20.2 0 0 0 0 7H4.551a11.78 11.78 0 0 1 0-7ZM5.9 22h4.4a18.82 18.82 0 0 0 2.85 6.36A12.03 12.03 0 0 1 5.9 22ZM16 28a11 11 0 0 1-1.615-.118A14.7 14.7 0 0 1 10.92 22h10.16a14.7 14.7 0 0 1-3.465 5.882A11 11 0 0 1 16 28Zm2.85.36A18.82 18.82 0 0 0 21.7 22h4.4a12.03 12.03 0 0 1-7.25 6.36ZM22.72 19.5a20.2 20.2 0 0 0 0-7h4.729a11.78 11.78 0 0 1 0 7ZM10.5 12.5h11a18.4 18.4 0 0 1 0 7h-11a18.4 18.4 0 0 1 0-7Z"/></svg>
-						<h3 class="mb-1 mt-3 text-sm font-semibold text-white">US &amp; EU Regions</h3>
-						<span class="text-xs leading-relaxed text-gray-400">Choose where your data lives</span>
-					</div>
-				</div>
-
-				<!-- SOC2 + GDPR badges -->
-				<div class="flex items-center justify-center gap-3 border-t border-[#141c2e] py-6">
-					<img
-						src="https://cdn-media.huggingface.co/marketing/pmh-page/soc2.png"
-						alt="SOC 2 Type II"
-						title="SOC 2 Type II certified"
-						class="h-8 opacity-50 brightness-125 transition-opacity hover:opacity-75"
-					/>
-					<img
-						src="https://cdn-media.huggingface.co/marketing/pmh-page/gdpr.png"
-						alt="GDPR Compliant"
-						title="GDPR compliant"
-						class="h-8 opacity-50 brightness-125 transition-opacity hover:opacity-75"
-					/>
 				</div>
 			</article>
 		</section>
 
+		<!-- Spacer -->
+		<section class="w-full border-b border-gray-200/50 dark:border-[#141c2e] px-4"><div class="mx-auto h-16 max-w-7xl border-l border-r border-gray-200/50 dark:border-[#141c2e]"></div></section>
+
 		<!-- ============================================================ -->
-		<!-- CTA: Get started with HF Storage Buckets                     -->
+		<!-- CTA: Ready to unlock PRO                                     -->
 		<!-- ============================================================ -->
-		<section class="w-full border-b border-gray-200/50 dark:border-[#141c2e] px-4">
-		<div class="w-full"><article
-			class="relative mx-auto max-w-7xl flex flex-col items-center overflow-hidden text-balance border-l border-r border-gray-200/50 dark:border-[#141c2e] bg-white dark:bg-gray-950 p-8 text-center max-sm:py-12 sm:p-10 lg:p-14"
-		>
-			<div class="absolute inset-0 bg-[url('https://cdn-uploads.huggingface.co/production/uploads/5f17f0a0925b9863e28ad517/7yYe9E-d38GWl6bnEUhhG.png')] bg-cover bg-center bg-no-repeat opacity-30 dark:opacity-15"></div>
-			<h2 class="relative mb-3 text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white xl:text-5xl">
+		<section class="w-full px-4">
+		<article class="relative mx-auto max-w-7xl flex flex-col items-center overflow-hidden border-l border-r border-gray-200/50 dark:border-[#141c2e] bg-white dark:bg-gray-950 p-8 text-center max-sm:py-12 sm:p-10 lg:p-14">
+			<h2 class="relative mb-3 text-4xl font-bold tracking-tight text-gray-900 dark:text-white xl:text-5xl">
 				Ready to unlock Hugging Face
 				<span class="relative inline-block">
-					<span
-						class="relative bg-clip-text text-transparent"
-						style="font-weight: 700; background-image: linear-gradient(151deg, #F6339A 15%, #00BC7D 50%, #FE9A00 100%); -webkit-background-clip: text;"
-					>PRO</span>
-					<span
-						class="absolute left-0 top-0 bg-clip-text text-transparent opacity-50 blur-xl"
-						style="font-weight: 700; background-image: linear-gradient(151deg, #F6339A 15%, #00BC7D 50%, #FE9A00 100%); -webkit-background-clip: text;"
-					>PRO</span>
+					<span class="relative bg-clip-text text-transparent" style="font-weight: 700; background-image: linear-gradient(151deg, #F6339A 15%, #00BC7D 50%, #FE9A00 100%); -webkit-background-clip: text;">PRO</span>
+					<span class="absolute left-0 top-0 bg-clip-text text-transparent opacity-50 blur-xl" style="font-weight: 700; background-image: linear-gradient(151deg, #F6339A 15%, #00BC7D 50%, #FE9A00 100%); -webkit-background-clip: text;">PRO</span>
 				</span>?
 			</h2>
-			<p class="relative mb-6 text-xl text-gray-600 dark:text-gray-400 sm:text-2xl xl:mb-12">
-				The all-in-one subscription to discover, use, and build with AI.
+			<p class="relative mb-8 text-xl text-gray-600 dark:text-gray-400 sm:text-2xl">
+				Join thousands of PRO users. Only $9/month. Cancel anytime.
 			</p>
-			<a
-				href="/pro"
-				class="relative z-[1] flex w-fit items-center gap-2 whitespace-nowrap rounded-full px-5 py-2 text-lg font-semibold text-black transition-all hover:bg-white dark:hover:bg-white bg-[#f3f4f6]"
-				style="box-shadow: 0 0 0 4px var(--btn-ring-inner), 0 0 0 5px var(--btn-ring-outer);"
-			>
+			<a href="/pro" class="relative z-[1] mx-auto flex w-fit items-center gap-2 whitespace-nowrap rounded-full px-5 py-2 text-lg font-semibold text-black transition-all hover:bg-white dark:hover:bg-white bg-[#f3f4f6]" style="box-shadow: 0 0 0 4px var(--btn-ring-inner), 0 0 0 5px var(--btn-ring-outer);">
 				<span>&rarr;</span>
 				<span>Subscribe to HF PRO ($9/month)</span>
 			</a>
-		</article></div>
+		</article>
 		</section>
+
 
 	</div>
 
