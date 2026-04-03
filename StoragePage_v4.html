@@ -114,7 +114,7 @@
 			</p>
 			<a
 				href="/pro"
-				class="relative z-[1] flex w-fit items-center gap-2 whitespace-nowrap rounded-full px-5 py-2 text-lg font-semibold text-black transition-all hover:bg-white dark:hover:bg-white bg-[#f3f4f6]"
+				class="relative z-[1] mx-auto flex w-fit items-center gap-2 whitespace-nowrap rounded-full px-5 py-2 text-lg font-semibold text-black transition-all hover:bg-white dark:hover:bg-white bg-[#f3f4f6]"
 				style="margin-top: 40px; box-shadow: 0 0 0 4px var(--btn-ring-inner, #030712), 0 0 0 5px var(--btn-ring-outer, #f3f4f6);"
 			>
 				<span>&rarr;</span>
@@ -1106,6 +1106,25 @@
 			mask.appendChild(mr);
 			defsEl.appendChild(mask);
 
+			// PRO gradient for animated blue lines
+			var proGrad = document.createElementNS(NS, 'linearGradient');
+			proGrad.setAttribute('id', 'pro-line-gradient');
+			proGrad.setAttribute('gradientUnits', 'userSpaceOnUse');
+			proGrad.setAttribute('x1', '0'); proGrad.setAttribute('y1', '0');
+			proGrad.setAttribute('x2', W); proGrad.setAttribute('y2', H);
+			var stops = [
+				{ offset: '0.15', color: '#F6339A' },
+				{ offset: '0.5', color: '#00BC7D' },
+				{ offset: '1', color: '#FE9A00' }
+			];
+			stops.forEach(function(s) {
+				var stop = document.createElementNS(NS, 'stop');
+				stop.setAttribute('offset', s.offset);
+				stop.setAttribute('stop-color', s.color);
+				proGrad.appendChild(stop);
+			});
+			defsEl.appendChild(proGrad);
+
 			// Lines group with mask
 			var linesG = document.createElementNS(NS, 'g');
 			linesG.setAttribute('mask', 'url(#floor-cutout)');
@@ -1218,7 +1237,7 @@
 
 			var el = document.createElementNS(NS, 'polyline');
 			el.setAttribute('fill', 'none');
-			el.setAttribute('stroke', BLUE);
+			el.setAttribute('stroke', 'url(#pro-line-gradient)');
 			el.setAttribute('stroke-width', '1');
 			el.setAttribute('stroke-linecap', 'round');
 			el.setAttribute('opacity', '0.8');
@@ -1350,7 +1369,7 @@
 			for (var key in affected) {
 				var info = affected[key];
 				if (info.maxStrength > 0.02) {
-					info.el.setAttribute('fill', BLUE);
+					info.el.setAttribute('fill', 'url(#pro-line-gradient)');
 					info.el.setAttribute('r', (0.5 + info.maxStrength * 0.5).toFixed(3));
 					info.el.setAttribute('opacity', Math.max(info.baseOpacity, info.maxStrength * 0.9).toFixed(3));
 					newBlue[key] = info;
