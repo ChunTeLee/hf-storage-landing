@@ -471,29 +471,85 @@
 					}
 				}
 
-				// PRO glow: color dots near the PRO text with gradient colors
+				// PRO glow: render text to canvas, find distance to nearest glyph pixel for each dot
 				var proSpan = document.querySelector('#hero-title > span:last-child');
 				if (proSpan && geo.dotEls) {
 					var proRect = proSpan.getBoundingClientRect();
+					var proLeft = proRect.left - sR.left;
+					var proTop = proRect.top - sR.top;
 					var proCx = (proRect.left + proRect.right) / 2 - sR.left;
-					var proCy = (proRect.top + proRect.bottom) / 2 - sR.top;
-					var glowRadius = 140;
+
+					// Render PRO text to offscreen canvas
+					var canv = document.createElement('canvas');
+					var pad = 30; // padding around text for glow reach
+					var cw = Math.ceil(proRect.width) + pad * 2;
+					var ch = Math.ceil(proRect.height) + pad * 2;
+					canv.width = cw; canv.height = ch;
+					var ctx = canv.getContext('2d');
+
+					// Draw the "PRO" text matching the h1 font
+					var prText = proSpan.querySelector('.bg-clip-text');
+					var cs = prText ? getComputedStyle(prText) : getComputedStyle(proSpan);
+					ctx.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+					ctx.fillStyle = 'white';
+					ctx.textBaseline = 'alphabetic';
+					// "PRO" baseline position
+					var baselineY = ch - pad - parseFloat(cs.fontSize) * 0.15;
+					ctx.fillText('PRO', pad, baselineY);
+
+					var imgData = ctx.getImageData(0, 0, cw, ch);
+					var pix = imgData.data;
+
+					// For each dot, find minimum distance to any white pixel in the canvas
+					var glowBand = 25; // px band around the text outline for glow
 					var gradC = [
 						{ r:246, g:51, b:154 },  // pink
 						{ r:0, g:188, b:125 },    // green
 						{ r:254, g:154, b:0 }     // orange
 					];
+
 					for (var r2 = 0; r2 < geo.dotRows; r2++) {
 						for (var c2 = 0; c2 < geo.dotCols; c2++) {
 							var el2 = geo.dotEls[r2][c2];
 							var dotX = fL + c2 * gapX;
 							var dotY = fT + r2 * gapY;
-							var dd = Math.sqrt((dotX-proCx)*(dotX-proCx)+(dotY-proCy)*(dotY-proCy));
-							if (dd < glowRadius && dd > 5) {
-								var str = 1 - dd / glowRadius;
-								str = Math.sqrt(str); // sqrt falloff (softer, wider glow)
-								var ang = Math.atan2(dotY - proCy, dotX - proCx);
-								var tt = (ang + Math.PI) / (2 * Math.PI);
+
+							// Convert dot position to canvas coordinates
+							var canvX = Math.round(dotX - proLeft + pad);
+							var canvY = Math.round(dotY - proTop + pad);
+
+							// Skip dots far outside the canvas area
+							if (canvX < -glowBand || canvX >= cw + glowBand || canvY < -glowBand || canvY >= ch + glowBand) continue;
+
+							// Check if dot is ON the text (alpha > 128)
+							var onText = false;
+							if (canvX >= 0 && canvX < cw && canvY >= 0 && canvY < ch) {
+								var idx4 = (canvY * cw + canvX) * 4;
+								if (pix[idx4 + 3] > 128) onText = true;
+							}
+
+							// Find min distance to text edge by sampling nearby pixels
+							var minD = 999;
+							var searchR = glowBand;
+							for (var sy = -searchR; sy <= searchR; sy += 2) {
+								for (var sx = -searchR; sx <= searchR; sx += 2) {
+									var px2 = canvX + sx;
+									var py2 = canvY + sy;
+									if (px2 >= 0 && px2 < cw && py2 >= 0 && py2 < ch) {
+										var idx2 = (py2 * cw + px2) * 4;
+										if (pix[idx2 + 3] > 128) {
+											var dd2 = Math.sqrt(sx*sx + sy*sy);
+											if (dd2 < minD) minD = dd2;
+										}
+									}
+								}
+							}
+
+							if (minD < glowBand && !onText) {
+								var str = 1 - minD / glowBand;
+								// Gradient color based on horizontal position relative to PRO
+								var tt = (dotX - (proLeft - pad)) / (proRect.width + pad * 2);
+								tt = Math.max(0, Math.min(1, tt));
 								var cc0, cc1, bl;
 								if (tt < 0.33) { cc0=gradC[0]; cc1=gradC[1]; bl=tt/0.33; }
 								else if (tt < 0.66) { cc0=gradC[1]; cc1=gradC[2]; bl=(tt-0.33)/0.33; }
@@ -501,11 +557,10 @@
 								var rr = Math.round(cc0.r+(cc1.r-cc0.r)*bl);
 								var gg = Math.round(cc0.g+(cc1.g-cc0.g)*bl);
 								var bb = Math.round(cc0.b+(cc1.b-cc0.b)*bl);
-								// Use rgba fill instead of opacity attribute to avoid killing surrounding dots
-								var gOp = str * 0.55;
+								var gOp = str * str * 0.65;
 								el2.setAttribute('fill', 'rgba('+rr+','+gg+','+bb+','+gOp.toFixed(3)+')');
 								el2.removeAttribute('opacity');
-								el2.setAttribute('r', (0.5 + str * 0.5).toFixed(3));
+								el2.setAttribute('r', (0.5 + str * 0.4).toFixed(3));
 								el2.dataset.baseOpacity = gOp;
 							}
 						}
