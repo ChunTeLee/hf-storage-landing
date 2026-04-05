@@ -472,12 +472,12 @@
 				}
 
 				// PRO glow: color dots near the PRO text with gradient colors
-				var proSpan = document.querySelector('#hero-title .ml-\\[0\\.15em\\]');
+				var proSpan = document.querySelector('#hero-title > span:last-child');
 				if (proSpan && geo.dotEls) {
 					var proRect = proSpan.getBoundingClientRect();
 					var proCx = (proRect.left + proRect.right) / 2 - sR.left;
 					var proCy = (proRect.top + proRect.bottom) / 2 - sR.top;
-					var glowRadius = 120;
+					var glowRadius = 140;
 					var gradC = [
 						{ r:246, g:51, b:154 },  // pink
 						{ r:0, g:188, b:125 },    // green
@@ -491,7 +491,7 @@
 							var dd = Math.sqrt((dotX-proCx)*(dotX-proCx)+(dotY-proCy)*(dotY-proCy));
 							if (dd < glowRadius && dd > 5) {
 								var str = 1 - dd / glowRadius;
-								str = str * str; // quadratic falloff
+								str = Math.sqrt(str); // sqrt falloff (softer, wider glow)
 								var ang = Math.atan2(dotY - proCy, dotX - proCx);
 								var tt = (ang + Math.PI) / (2 * Math.PI);
 								var cc0, cc1, bl;
@@ -501,10 +501,11 @@
 								var rr = Math.round(cc0.r+(cc1.r-cc0.r)*bl);
 								var gg = Math.round(cc0.g+(cc1.g-cc0.g)*bl);
 								var bb = Math.round(cc0.b+(cc1.b-cc0.b)*bl);
-								var gOp = str * 0.7;
-								el2.setAttribute('fill', 'rgb('+rr+','+gg+','+bb+')');
-								el2.setAttribute('opacity', gOp.toFixed(3));
-								el2.setAttribute('r', (0.5 + str * 0.8).toFixed(3));
+								// Use rgba fill instead of opacity attribute to avoid killing surrounding dots
+								var gOp = str * 0.55;
+								el2.setAttribute('fill', 'rgba('+rr+','+gg+','+bb+','+gOp.toFixed(3)+')');
+								el2.removeAttribute('opacity');
+								el2.setAttribute('r', (0.5 + str * 0.5).toFixed(3));
 								el2.dataset.baseOpacity = gOp;
 							}
 						}
