@@ -545,7 +545,11 @@
 								}
 							}
 
-							if (minD < glowBand && !onText) {
+							// Hide dots ON the text to avoid dark rim
+							if (onText) {
+								el2.setAttribute('fill', 'rgba(0,0,0,0)');
+								el2.dataset.baseOpacity = 0;
+							} else if (minD < glowBand) {
 								var str = 1 - minD / glowBand;
 								// Gradient color based on horizontal position relative to PRO
 								var tt = (dotX - (proLeft - pad)) / (proRect.width + pad * 2);
