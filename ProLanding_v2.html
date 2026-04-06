@@ -111,9 +111,9 @@
 				The all-in-one subscription to discover, use, and build with AI.
 			</p>
 			<div class="relative mx-auto w-fit" style="margin-top: 40px;">
-				<!-- SVG outline ring for glow effect -->
-				<svg id="cta-ring-svg" class="absolute inset-0 pointer-events-none" style="margin: -5px; width: calc(100% + 10px); height: calc(100% + 10px);" overflow="visible">
-					<rect id="cta-ring" x="5" y="5" width="calc(100% - 10)" height="calc(100% - 10)" rx="9999" fill="none" stroke-width="1" class="transition-colors"/>
+				<!-- SVG overlay for spot glow effects on CTA outline -->
+				<svg id="cta-ring-svg" class="absolute inset-0 pointer-events-none" overflow="visible">
+					<defs><filter id="glow-blur"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
 				</svg>
 				<a id="cta-button"
 					href="/pro"
@@ -407,19 +407,14 @@
 			});
 			defsEl.appendChild(proGrad);
 
-			// Update CTA ring SVG to match button size
+			// Size CTA glow SVG to match button
 			var ringSvg = document.getElementById('cta-ring-svg');
-			var ring = document.getElementById('cta-ring');
-			if (ringSvg && ring) {
-				ring.setAttribute('x', '0');
-				ring.setAttribute('y', '0');
-				ring.setAttribute('width', ctaR.width + 2);
-				ring.setAttribute('height', ctaR.height + 2);
-				ring.setAttribute('rx', geo.ctaRx + 1);
-				ring.setAttribute('stroke', getLineColor());
-				ringSvg.style.margin = '-1px';
-				ringSvg.style.width = (ctaR.width + 2) + 'px';
-				ringSvg.style.height = (ctaR.height + 2) + 'px';
+			if (ringSvg) {
+				ringSvg.style.width = ctaR.width + 'px';
+				ringSvg.style.height = ctaR.height + 'px';
+				// Clear any leftover glow circles from previous draw
+				var oldGlows = ringSvg.querySelectorAll('circle');
+				oldGlows.forEach(function(c) { c.remove(); });
 			}
 		}
 
@@ -429,42 +424,48 @@
 		var MAX_LINES = 8;
 		var SPAWN_DIST = 50;
 
+		// Find nearest point on CTA button boundary (rounded rect) from a given point
+		function nearestCtaPoint(px, py) {
+			// Clamp to the rounded rect boundary
+			var cx = Math.max(geo.ctaLeft, Math.min(geo.ctaRight, px));
+			var cy = Math.max(geo.ctaTop, Math.min(geo.ctaBottom, py));
+			// Push to nearest edge
+			var dL = cx - geo.ctaLeft, dR = geo.ctaRight - cx;
+			var dT = cy - geo.ctaTop, dB = geo.ctaBottom - cy;
+			var minD = Math.min(dL, dR, dT, dB);
+			if (minD === dL) cx = geo.ctaLeft;
+			else if (minD === dR) cx = geo.ctaRight;
+			else if (minD === dT) cy = geo.ctaTop;
+			else cy = geo.ctaBottom;
+			return { x: cx, y: cy };
+		}
+
 		function spawnLine() {
 			if (anim.lines.length >= MAX_LINES) return;
 			var W = geo.W, H = geo.H;
 			if (W === 0) return;
 
-			// Pick edge: all 4 edges equally (25% each)
+			// Pick edge
 			var r = Math.random();
 			var edge = r < 0.25 ? 'top' : r < 0.5 ? 'left' : r < 0.75 ? 'right' : 'bottom';
+			var t = Math.random();
 
-			var t = Math.random(); // random position along edge
+			// Start point on section edge (rim)
+			var startX, startY;
+			if (edge === 'top') { startX = lerp(0, W, t); startY = 0; }
+			else if (edge === 'left') { startX = 0; startY = lerp(0, H, t); }
+			else if (edge === 'right') { startX = W; startY = lerp(0, H, t); }
+			else { startX = lerp(0, W, t); startY = H; }
 
-			// Rim point on section edge, target = CTA button center
-			var rimX, rimY, outX, outY;
-			var floorX = geo.ctaCx, floorY = geo.ctaCy;
-			if (edge === 'top') {
-				rimX = lerp(0, W, t); rimY = 0;
-				outX = rimX; outY = -SPAWN_DIST;
-			} else if (edge === 'left') {
-				rimX = 0; rimY = lerp(0, H, t);
-				outX = -SPAWN_DIST; outY = rimY;
-			} else if (edge === 'right') {
-				rimX = W; rimY = lerp(0, H, t);
-				outX = W + SPAWN_DIST; outY = rimY;
-			} else {
-				rimX = lerp(0, W, t); rimY = H;
-				outX = rimX; outY = H + SPAWN_DIST;
-			}
+			// Target = nearest point on CTA button boundary
+			var target = nearestCtaPoint(startX, startY);
+			var totalDist = dist(startX, startY, target.x, target.y);
+			if (totalDist < 10) return; // too close
 
-			var outsideDist = SPAWN_DIST;
-			var insideDist = dist(rimX, rimY, floorX, floorY);
-			var totalDist = outsideDist + insideDist;
 			var lineLen = rand(15, 40);
-			var speed = totalDist / rand(3000, 5000); // px per ms
+			var SPEED = 0.04; // uniform slow speed: px per ms
 
-			var el = document.createElementNS(NS, 'polyline');
-			el.setAttribute('fill', 'none');
+			var el = document.createElementNS(NS, 'line');
 			el.setAttribute('stroke', 'url(#pro-line-gradient)');
 			el.setAttribute('stroke-width', '1');
 			el.setAttribute('stroke-linecap', 'round');
@@ -473,128 +474,86 @@
 			if (animG) animG.appendChild(el);
 
 			anim.lines.push({
-				el: el, edge: edge, t: t,
-				outX: outX, outY: outY,
-				rimX: rimX, rimY: rimY,
-				floorX: floorX, floorY: floorY,
-				outsideDist: outsideDist, insideDist: insideDist, totalDist: totalDist,
-				lineLen: lineLen, speed: speed,
-				traveled: 0
+				el: el,
+				startX: startX, startY: startY,
+				targetX: target.x, targetY: target.y,
+				totalDist: totalDist, lineLen: lineLen,
+				speed: SPEED, traveled: 0
 			});
 		}
 
-		function posOnPath(line, d) {
-			// d = distance along the total path (outside + inside)
-			if (d <= line.outsideDist) {
-				// Still in outside segment (perpendicular approach)
-				var p = d / line.outsideDist;
-				return { x: lerp(line.outX, line.rimX, p), y: lerp(line.outY, line.rimY, p) };
-			} else {
-				// Inside segment (perspective direction)
-				var inner = d - line.outsideDist;
-				var p = Math.min(1, inner / line.insideDist);
-				return { x: lerp(line.rimX, line.floorX, p), y: lerp(line.rimY, line.floorY, p) };
-			}
-		}
-
 		function updateLine(line, dt) {
-			// Smooth continuous motion
 			line.traveled += line.speed * dt;
 			var headD = Math.min(line.traveled, line.totalDist);
 			var tailD = Math.max(0, line.traveled - line.lineLen);
 
-			// No fade — line emerges from tip at full opacity like coming out of a portal
-			line.el.setAttribute('opacity', '0.8');
+			var p1 = headD / line.totalDist;
+			var p2 = tailD / line.totalDist;
+			var hx = lerp(line.startX, line.targetX, p1);
+			var hy = lerp(line.startY, line.targetY, p1);
+			var tx = lerp(line.startX, line.targetX, p2);
+			var ty = lerp(line.startY, line.targetY, p2);
 
-			// Compute polyline points
-			var head = posOnPath(line, headD);
-			var tail = posOnPath(line, Math.min(tailD, line.totalDist));
+			line.el.setAttribute('x1', tx);
+			line.el.setAttribute('y1', ty);
+			line.el.setAttribute('x2', hx);
+			line.el.setAttribute('y2', hy);
 
-			var headInside = headD > line.outsideDist;
-			var tailInside = tailD > line.outsideDist;
-
-			var pts;
-			if (!headInside && !tailInside) {
-				pts = tail.x+','+tail.y+' '+head.x+','+head.y;
-			} else if (headInside && !tailInside) {
-				pts = tail.x+','+tail.y+' '+line.rimX+','+line.rimY+' '+head.x+','+head.y;
-			} else {
-				pts = tail.x+','+tail.y+' '+head.x+','+head.y;
-			}
-			line.el.setAttribute('points', pts);
-
-			// Done when TAIL reaches the CTA button
-			// Trigger CTA glow when HEAD first reaches button boundary
-			if (headD >= line.totalDist && !line.rippleTriggered) {
-				line.rippleTriggered = true;
-				// Get gradient color at the impact point (based on horizontal position)
-				var headPos = posOnPath(line, headD);
-				var tt = (headPos.x - geo.ctaLeft) / geo.ctaW;
-				tt = Math.max(0, Math.min(1, tt));
-				var gradColors = [
-					[246,51,154], // pink
-					[0,188,125],  // green
-					[254,154,0]   // orange
-				];
+			// Trigger CTA spot glow when head reaches button
+			if (headD >= line.totalDist && !line.glowTriggered) {
+				line.glowTriggered = true;
+				var impactX = line.targetX;
+				var impactY = line.targetY;
+				// Get gradient color based on position along section width
+				var tt = impactX / geo.W;
+				var gradC = [[246,51,154],[0,188,125],[254,154,0]];
 				var c0, c1, bl;
-				if (tt < 0.33) { c0=gradColors[0]; c1=gradColors[1]; bl=tt/0.33; }
-				else if (tt < 0.66) { c0=gradColors[1]; c1=gradColors[2]; bl=(tt-0.33)/0.33; }
-				else { c0=gradColors[2]; c1=gradColors[0]; bl=(tt-0.66)/0.34; }
-				var impactColor = 'rgb(' + Math.round(c0[0]+(c1[0]-c0[0])*bl) + ',' + Math.round(c0[1]+(c1[1]-c0[1])*bl) + ',' + Math.round(c0[2]+(c1[2]-c0[2])*bl) + ')';
-				createCtaGlow(headPos.x, headPos.y, impactColor);
+				if (tt < 0.33) { c0=gradC[0]; c1=gradC[1]; bl=tt/0.33; }
+				else if (tt < 0.66) { c0=gradC[1]; c1=gradC[2]; bl=(tt-0.33)/0.33; }
+				else { c0=gradC[2]; c1=gradC[0]; bl=(tt-0.66)/0.34; }
+				var color = 'rgb('+Math.round(c0[0]+(c1[0]-c0[0])*bl)+','+Math.round(c0[1]+(c1[1]-c0[1])*bl)+','+Math.round(c0[2]+(c1[2]-c0[2])*bl)+')';
+				createCtaGlow(impactX, impactY, color);
 			}
 			return tailD >= line.totalDist;
 		}
 
-		// CTA outline glow: when a line touches the button, that part of the outline glows
+		// CTA spot glow: small ~20px glow on the outline at the touch point
 		function createCtaGlow(cx, cy, color) {
+			var ringSvg = document.getElementById('cta-ring-svg');
+			if (!ringSvg) return;
+
+			// Create a small glowing circle at the impact point, relative to the CTA button
+			var glowEl = document.createElementNS(NS, 'circle');
+			var localX = cx - geo.ctaLeft + 1; // +1 for SVG margin offset
+			var localY = cy - geo.ctaTop + 1;
+			glowEl.setAttribute('cx', localX);
+			glowEl.setAttribute('cy', localY);
+			glowEl.setAttribute('r', '10');
+			glowEl.setAttribute('fill', color);
+			glowEl.setAttribute('opacity', '0.6');
+			glowEl.setAttribute('filter', 'url(#glow-blur)');
+			ringSvg.appendChild(glowEl);
+
 			anim.glowSegments.push({
-				cx: cx, cy: cy, color: color,
+				el: glowEl,
 				startTime: performance.now(),
-				duration: 2000 // 2 second fade
+				duration: 1500
 			});
 		}
 
 		function updateCtaGlow(now) {
-			var ring = document.getElementById('cta-ring');
-			if (!ring || anim.glowSegments.length === 0) {
-				if (ring && anim.glowSegments.length === 0) {
-					ring.setAttribute('stroke', getLineColor());
-					ring.removeAttribute('filter');
-				}
-				return;
-			}
-
-			// Remove expired glows
 			for (var i = anim.glowSegments.length - 1; i >= 0; i--) {
-				if (now - anim.glowSegments[i].startTime >= anim.glowSegments[i].duration) {
-					anim.glowSegments.splice(i, 1);
-				}
-			}
-
-			if (anim.glowSegments.length === 0) {
-				ring.setAttribute('stroke', getLineColor());
-				ring.removeAttribute('filter');
-				return;
-			}
-
-			// Find the strongest active glow
-			var strongest = null, maxStr = 0;
-			for (var i = 0; i < anim.glowSegments.length; i++) {
 				var g = anim.glowSegments[i];
 				var elapsed = now - g.startTime;
-				var str = 1 - elapsed / g.duration;
-				if (str > maxStr) { maxStr = str; strongest = g; }
-			}
-
-			if (strongest && maxStr > 0.02) {
-				ring.setAttribute('stroke', strongest.color);
-				ring.setAttribute('stroke-opacity', (maxStr * 0.8).toFixed(3));
-				ring.setAttribute('stroke-width', (1 + maxStr * 1.5).toFixed(2));
-			} else {
-				ring.setAttribute('stroke', getLineColor());
-				ring.removeAttribute('stroke-opacity');
-				ring.setAttribute('stroke-width', '1');
+				var progress = elapsed / g.duration;
+				if (progress >= 1) {
+					g.el.remove();
+					anim.glowSegments.splice(i, 1);
+				} else {
+					var fade = 1 - progress;
+					g.el.setAttribute('opacity', (fade * 0.6).toFixed(3));
+					g.el.setAttribute('r', (10 + progress * 5).toFixed(1));
+				}
 			}
 		}
 
@@ -642,9 +601,10 @@
 			if (animFrameId) clearTimeout(animFrameId);
 			var ag = document.getElementById('anim-blue-lines');
 			if (ag) ag.innerHTML = '';
-			// Reset CTA ring
-			var ring = document.getElementById('cta-ring');
-			if (ring) { ring.setAttribute('stroke', getLineColor()); ring.removeAttribute('stroke-opacity'); ring.setAttribute('stroke-width', '1'); }
+			// Clear glow spots
+			for (var i = 0; i < anim.glowSegments.length; i++) {
+				if (anim.glowSegments[i].el) anim.glowSegments[i].el.remove();
+			}
 			anim.lines = [];
 			anim.glowSegments = [];
 		}
