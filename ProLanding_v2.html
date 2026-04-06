@@ -82,14 +82,16 @@
 		<!-- SECTION 1: HERO                              -->
 		<!-- ============================================ -->
 		<section id="hero-section"
-			class="relative mx-auto flex max-w-7xl flex-col items-center text-balance border-l border-r border-b border-gray-200/50 dark:border-[#141c2e] px-4 pb-16 pt-12 text-center sm:px-6 sm:pt-16 lg:px-8 lg:pt-20"
+			class="relative mx-auto flex max-w-7xl flex-col items-center overflow-hidden text-balance border-l border-r border-b border-gray-200/50 dark:border-[#141c2e] px-4 pb-16 pt-12 text-center sm:px-6 sm:pt-16 lg:px-8 lg:pt-20"
 		>
-			<svg id="bucket-svg" class="absolute inset-0 pointer-events-none" width="100%" height="100%" overflow="visible" xmlns="http://www.w3.org/2000/svg">
+			<!-- Icon pattern background (initially hidden, lit by moving lines) -->
+			<canvas id="icon-canvas" class="absolute inset-0 pointer-events-none" style="opacity: 0;"></canvas>
+			<!-- SVG for animated moving lines -->
+			<svg id="bucket-svg" class="absolute inset-0 pointer-events-none" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
 				<defs id="bucket-defs"></defs>
-				<g id="bucket-lines"></g>
 				<g id="anim-blue-lines"></g>
-				<g id="anim-dot-ripples"></g>
 			</svg>
+			<!-- Content with blur mask behind it -->
 			<div id="hero-floor" class="relative px-4 py-6 text-center sm:px-6 sm:py-8 lg:px-8 lg:py-10">
 			<h1 id="hero-title"
 				class="relative inline-flex items-baseline whitespace-nowrap text-gray-900 dark:text-white text-5xl sm:text-6xl md:text-[72px] md:leading-[72px]"
@@ -110,20 +112,14 @@
 			<p class="relative text-xl text-gray-600 dark:text-[#99a1af] sm:text-2xl" style="margin-top: 20px;">
 				The all-in-one subscription to discover, use, and build with AI.
 			</p>
-			<div class="relative mx-auto w-fit" style="margin-top: 40px;">
-				<!-- SVG ring border with 2px gap around CTA button -->
-				<svg id="cta-ring-svg" class="absolute pointer-events-none" overflow="visible">
-					<rect id="cta-ring-base" fill="none" stroke-width="0.667" rx="9999"/>
-					<!-- Hit segments will be appended here dynamically -->
-				</svg>
-				<a id="cta-button"
-					href="/pro"
-					class="relative z-[1] flex items-center gap-2 whitespace-nowrap rounded-full px-5 py-2 text-lg font-semibold text-black transition-all hover:bg-white dark:hover:bg-white bg-[#f3f4f6]"
-				>
-					<span>&rarr;</span>
-					<span>Subscribe to HF PRO ($9/month)</span>
-				</a>
-			</div>
+			<a id="cta-button"
+				href="/pro"
+				class="relative z-[1] mx-auto flex w-fit items-center gap-2 whitespace-nowrap rounded-full border border-[#f3f4f6] px-5 py-2 text-lg font-semibold text-black transition-all hover:bg-white dark:hover:bg-white bg-[#f3f4f6]"
+				style="margin-top: 40px;"
+			>
+				<span>&rarr;</span>
+				<span>Subscribe to HF PRO ($9/month)</span>
+			</a>
 			</div>
 		</section>
 
@@ -348,177 +344,178 @@
 	})();
 	</script>
 
-	<!-- Perspective bucket lines for hero section -->
+	<!-- Hero animation: icon pattern + moving lines -->
 	<script>
 	(function() {
-		var N = 10;
-		var LINE_WIDTH = 0.667;
 		var NS = 'http://www.w3.org/2000/svg';
-		var BLUE = '#2B7FFF';
-
 		function isDark() { return document.documentElement.classList.contains('dark'); }
 		function getLineColor() { return isDark() ? '#141c2e' : '#e2e5ea'; }
-		function getDotFill(opacity) { return isDark() ? 'rgba(255,255,255,' + opacity + ')' : 'rgba(0,0,0,' + opacity + ')'; }
 
 		function lerp(a, b, t) { return a + (b - a) * t; }
 		function dist(x1,y1,x2,y2) { return Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1)); }
 		function rand(a, b) { return a + Math.random() * (b - a); }
 
-		// Shared geometry — updated by draw()
-		var geo = { W:0, H:0, ctaCx:0, ctaCy:0, ctaLeft:0, ctaTop:0, ctaRight:0, ctaBottom:0, ctaRx:0 };
+		// SVG icon paths (from uploaded assets)
+		var ICON_PATHS = [
+			// proStar
+			'M8.64 1.68C8.64 3.75 9.53 5.12 10.64 6C11.79 6.91 13.17 7.33 14.08 7.43V8.57C12.83 8.74 11.65 9.23 10.65 10C10 10.51 9.48 11.17 9.13 11.92C8.78 12.67 8.61 13.49 8.64 14.32H7.36C7.36 12.25 6.47 10.88 5.36 10C4.36 9.23 3.17 8.73 1.92 8.57V7.43C3.17 7.26 4.35 6.77 5.35 6C6 5.49 6.52 4.83 6.87 4.08C7.22 3.33 7.39 2.51 7.36 1.68H8.64Z',
+			// storage
+			'M2.5 13V5.5H13.5V13C13.5 13.28 13.28 13.5 13 13.5H3C2.72 13.5 2.5 13.28 2.5 13ZM6 7.5C5.72 7.5 5.5 7.72 5.5 8C5.5 8.28 5.72 8.5 6 8.5H10C10.28 8.5 10.5 8.28 10.5 8C10.5 7.72 10.28 7.5 10 7.5H6Z',
+			// zeroGPU (simplified)
+			'M8 7.38C7.65 7.38 7.37 7.65 7.37 8C7.37 8.35 7.65 8.63 8 8.63C8.35 8.63 8.63 8.35 8.63 8C8.63 7.65 8.35 7.38 8 7.38ZM8.3 1.75C11.11 1.75 11.18 3.98 9.71 4.72C9.09 5.03 8.81 5.68 8.7 6.26C9 6.39 9.26 6.58 9.46 6.83C11.77 5.58 14.25 6.08 14.25 8.31C14.25 11.13 12.02 11.19 11.29 9.71C10.97 9.09 10.31 8.81 9.73 8.69C9.61 8.99 9.41 9.25 9.16 9.46C10.41 11.77 9.91 14.25 7.68 14.25C4.87 14.25 4.81 12.01 6.29 11.28C6.9 10.97 7.17 10.32 7.3 9.74C6.99 9.62 6.72 9.42 6.52 9.17C4.22 10.41 1.75 9.92 1.75 7.69C1.75 4.88 3.97 4.81 4.71 6.29C5.02 6.91 5.68 7.18 6.26 7.29C6.37 6.99 6.57 6.73 6.83 6.53C5.59 4.23 6.08 1.75 8.3 1.75Z',
+			// credits
+			'M4.8 4V3.6C4.8 2.5 6.95 1.6 9.6 1.6C12.25 1.6 14.4 2.5 14.4 3.6V4C14.4 4.77 13.37 5.43 11.85 5.77C11.28 5.19 10.26 4.68 9.6 4.68C9.05 4.68 8.52 4.04 7.8 4.1ZM1.6 7.6C1.6 6.1 3.75 5.2 6.4 5.2C9.05 5.2 11.2 6.1 11.2 7.2V7.6C11.2 8.71 9.05 9.6 6.4 9.6C3.75 9.6 1.6 8.71 1.6 7.6ZM11.2 12.4C11.2 13.51 9.05 14.4 6.4 14.4C3.75 14.4 1.6 13.51 1.6 12.4V12.02C1.89 12.22 2.21 12.38 2.55 12.52C3.59 12.96 4.96 13.2 6.4 13.2C7.84 13.2 9.21 12.96 10.26 12.52C10.59 12.39 10.91 12.22 11.2 12.02V12.4Z',
+			// dataset
+			'M8 4.48C10.65 4.48 12.8 3.91 12.8 3.2C12.8 2.49 10.65 1.92 8 1.92C5.35 1.92 3.2 2.49 3.2 3.2C3.2 3.91 5.35 4.48 8 4.48ZM8 9.6C10.65 9.6 12.8 9.03 12.8 8.32V12.8C12.8 13.51 10.65 14.08 8 14.08C5.35 14.08 3.2 13.51 3.2 12.8V8.32C3.2 9.03 5.35 9.6 8 9.6Z',
+			// post
+			'M4.79 2.93C5.75 2.32 6.86 2 8 2C9.59 2 11.12 2.63 12.24 3.76C13.37 4.88 14 6.41 14 8C14 9.1 13.7 10.17 13.14 11.1C12.89 11.51 12.59 11.9 12.24 12.24C11.12 13.37 9.59 14 8 14H2.6C2.27 14 2 13.72 2 13.4V13.28C2.04 13.17 2.09 13.06 2.18 12.98L3.36 11.8C2.64 10.92 2.18 9.85 2.04 8.73C1.91 7.6 2.09 6.46 2.58 5.43C3.07 4.4 3.83 3.54 4.79 2.93Z'
+		];
+		var ICON_COLORS = ['url(#proGrad)', '#51A2FF', '#ffffff', '#FEE685', '#FF6467', '#FFB800'];
 
-		// ==================== draw() — no perspective lines, no dots ====================
+		var geo = { W:0, H:0, ctaCx:0, ctaCy:0 };
+		var iconGrid = []; // [{x, y, iconIdx, opacity}]
+
+		// ==================== draw() ====================
 		function draw() {
 			var section = document.getElementById('hero-section');
 			var ctaBtn = document.getElementById('cta-button');
-			var g = document.getElementById('bucket-lines');
 			var defsEl = document.getElementById('bucket-defs');
-			if (!section || !ctaBtn || !g || !defsEl) return;
+			if (!section || !ctaBtn || !defsEl) return;
 
-			g.innerHTML = '';
 			defsEl.innerHTML = '';
-
 			var sR = section.getBoundingClientRect();
 			var ctaR = ctaBtn.getBoundingClientRect();
-
-			var W = sR.width, H = sR.height;
-			geo.W = W; geo.H = H;
+			geo.W = sR.width; geo.H = sR.height;
 			geo.ctaCx = (ctaR.left + ctaR.right) / 2 - sR.left;
 			geo.ctaCy = (ctaR.top + ctaR.bottom) / 2 - sR.top;
-			geo.ctaLeft = ctaR.left - sR.left;
-			geo.ctaTop = ctaR.top - sR.top;
-			geo.ctaRight = ctaR.right - sR.left;
-			geo.ctaBottom = ctaR.bottom - sR.top;
-			geo.ctaW = ctaR.width;
-			geo.ctaH = ctaR.height;
-			geo.ctaRx = ctaR.height / 2; // rounded-full = half height
 
-			// PRO gradient for animated lines
+			// PRO gradient for lines
 			var proGrad = document.createElementNS(NS, 'linearGradient');
 			proGrad.setAttribute('id', 'pro-line-gradient');
 			proGrad.setAttribute('gradientUnits', 'userSpaceOnUse');
 			proGrad.setAttribute('x1', '0'); proGrad.setAttribute('y1', '0');
-			proGrad.setAttribute('x2', W); proGrad.setAttribute('y2', H);
-			[{ offset:'0.15', color:'#F6339A' },{ offset:'0.5', color:'#00BC7D' },{ offset:'1', color:'#FE9A00' }].forEach(function(s) {
-				var stop = document.createElementNS(NS, 'stop');
-				stop.setAttribute('offset', s.offset);
-				stop.setAttribute('stop-color', s.color);
-				proGrad.appendChild(stop);
+			proGrad.setAttribute('x2', geo.W); proGrad.setAttribute('y2', geo.H);
+			[{o:'0.15',c:'#F6339A'},{o:'0.5',c:'#00BC7D'},{o:'1',c:'#FE9A00'}].forEach(function(s) {
+				var st = document.createElementNS(NS, 'stop');
+				st.setAttribute('offset', s.o); st.setAttribute('stop-color', s.c);
+				proGrad.appendChild(st);
 			});
 			defsEl.appendChild(proGrad);
 
-			// Position the ring SVG with 2px gap around button
-			var GAP = 2;
-			var ringSvg = document.getElementById('cta-ring-svg');
-			var ringBase = document.getElementById('cta-ring-base');
-			if (ringSvg && ringBase) {
-				var ringW = ctaR.width + GAP * 2;
-				var ringH = ctaR.height + GAP * 2;
-				ringSvg.style.left = -GAP + 'px';
-				ringSvg.style.top = -GAP + 'px';
-				ringSvg.style.width = ringW + 'px';
-				ringSvg.style.height = ringH + 'px';
-				ringSvg.setAttribute('viewBox', '0 0 ' + ringW + ' ' + ringH);
-				ringBase.setAttribute('x', '0.5');
-				ringBase.setAttribute('y', '0.5');
-				ringBase.setAttribute('width', ringW - 1);
-				ringBase.setAttribute('height', ringH - 1);
-				ringBase.setAttribute('rx', ringH / 2);
-				ringBase.setAttribute('stroke', getLineColor());
-				// Store ring geometry for hit detection
-				geo.ringLeft = geo.ctaLeft - GAP;
-				geo.ringTop = geo.ctaTop - GAP;
-				geo.ringRight = geo.ctaRight + GAP;
-				geo.ringBottom = geo.ctaBottom + GAP;
-				geo.ringW = ringW;
-				geo.ringH = ringH;
-				geo.ringRx = ringH / 2;
-				// Compute ring perimeter for dash positioning
-				var straightW = ringW - ringH; // straight portion (total width minus two semicircles)
-				geo.ringPerimeter = Math.PI * ringH + straightW * 2;
-				// Clear old hit segments
-				var oldSegs = ringSvg.querySelectorAll('.hit-seg');
-				oldSegs.forEach(function(s) { s.remove(); });
+			// Build randomized icon grid on canvas
+			buildIconGrid();
+			renderIconCanvas();
+		}
+
+		// Build grid of randomly placed icons
+		function buildIconGrid() {
+			iconGrid = [];
+			var W = geo.W, H = geo.H;
+			var spacing = 60; // px between icons
+			var cols = Math.ceil(W / spacing);
+			var rows = Math.ceil(H / spacing);
+			for (var r = 0; r < rows; r++) {
+				for (var c = 0; c < cols; c++) {
+					var x = c * spacing + rand(-10, 10) + spacing / 2;
+					var y = r * spacing + rand(-10, 10) + spacing / 2;
+					iconGrid.push({
+						x: x, y: y,
+						iconIdx: Math.floor(rand(0, ICON_PATHS.length)),
+						baseOpacity: 0, // starts hidden
+						currentOpacity: 0
+					});
+				}
 			}
 		}
 
-		// ==================== Animation system ====================
-		var anim = { lines: [], glowSegments: [], lastSpawn: 0, nextDelay: 1000 };
+		// Render icons to canvas
+		function renderIconCanvas() {
+			var canvas = document.getElementById('icon-canvas');
+			var section = document.getElementById('hero-section');
+			if (!canvas || !section) return;
+			var dpr = window.devicePixelRatio || 1;
+			canvas.width = geo.W * dpr;
+			canvas.height = geo.H * dpr;
+			canvas.style.width = geo.W + 'px';
+			canvas.style.height = geo.H + 'px';
+			canvas.style.opacity = '1'; // show the canvas
+			var ctx = canvas.getContext('2d');
+			ctx.scale(dpr, dpr);
+			ctx.clearRect(0, 0, geo.W, geo.H);
+
+			// Content mask: fade icons near content area (traces.com style)
+			// Get content bounds
+			var floor = document.getElementById('hero-floor');
+			var fR = floor ? floor.getBoundingClientRect() : null;
+			var sR = section.getBoundingClientRect();
+			var contentCx = geo.W / 2;
+			var contentCy = fR ? (fR.top + fR.bottom) / 2 - sR.top : geo.H / 2;
+
+			var iconSize = 14;
+			var gradColors = [
+				[246,51,154], // pink
+				[0,188,125],  // green
+				[254,154,0]   // orange
+			];
+
+			for (var i = 0; i < iconGrid.length; i++) {
+				var ic = iconGrid[i];
+				var op = ic.currentOpacity;
+				if (op < 0.01) continue;
+
+				// Content proximity fade (traces.com style mask)
+				var dContent = dist(ic.x, ic.y, contentCx, contentCy);
+				var maxDist = Math.sqrt(geo.W * geo.W / 4 + geo.H * geo.H / 4);
+				var contentFade = Math.min(1, dContent / (maxDist * 0.4));
+				if (contentFade < 0.05) contentFade = 0;
+
+				var finalOp = op * contentFade;
+				if (finalOp < 0.01) continue;
+
+				// Pick color based on icon index
+				var ci = ic.iconIdx % gradColors.length;
+				var col = gradColors[ci];
+
+				ctx.save();
+				ctx.globalAlpha = finalOp;
+				ctx.translate(ic.x - iconSize / 2, ic.y - iconSize / 2);
+
+				// Draw the icon path
+				var p = new Path2D(ICON_PATHS[ic.iconIdx]);
+				ctx.fillStyle = 'rgb(' + col[0] + ',' + col[1] + ',' + col[2] + ')';
+				ctx.fill(p);
+
+				ctx.restore();
+			}
+		}
+
+		// ==================== Animation ====================
+		var anim = { lines: [], lastSpawn: 0, nextDelay: 1000 };
 		var animRunning = false, animFrameId = null;
-		var MAX_LINES = 8;
-		var SPAWN_DIST = 50;
-
-		// Find nearest point on the ring boundary from a given point
-		function nearestRingPoint(px, py) {
-			var cx = Math.max(geo.ringLeft, Math.min(geo.ringRight, px));
-			var cy = Math.max(geo.ringTop, Math.min(geo.ringBottom, py));
-			var dL = cx - geo.ringLeft, dR = geo.ringRight - cx;
-			var dT = cy - geo.ringTop, dB = geo.ringBottom - cy;
-			var minD = Math.min(dL, dR, dT, dB);
-			if (minD === dL) cx = geo.ringLeft;
-			else if (minD === dR) cx = geo.ringRight;
-			else if (minD === dT) cy = geo.ringTop;
-			else cy = geo.ringBottom;
-			return { x: cx, y: cy };
-		}
-
-		// Convert a hit point on the ring to a position along the perimeter (0 to perimeter)
-		// The rounded rect perimeter starts at top-left corner, goes clockwise
-		function hitToPerimeterPos(hx, hy) {
-			// Convert to ring-local coords
-			var lx = hx - geo.ringLeft;
-			var ly = hy - geo.ringTop;
-			var rW = geo.ringW, rH = geo.ringH;
-			var rx = geo.ringRx;
-			var straightW = rW - rH; // straight portion per side
-
-			// Top edge: from (rx, 0) to (rx + straightW, 0)
-			if (ly <= 0.5 && lx >= rx && lx <= rx + straightW) {
-				return lx - rx; // 0 to straightW
-			}
-			// Right semicircle: from top-right to bottom-right
-			if (lx >= rx + straightW) {
-				var ang = Math.atan2(ly - rx, lx - (rx + straightW));
-				if (ang < 0) ang += Math.PI * 2;
-				return straightW + ang * rx;
-			}
-			// Bottom edge: from (rx + straightW, rH) to (rx, rH)
-			if (ly >= rH - 0.5 && lx >= rx && lx <= rx + straightW) {
-				return straightW + Math.PI * rx + (rx + straightW - lx);
-			}
-			// Left semicircle: from bottom-left to top-left
-			if (lx <= rx) {
-				var ang = Math.atan2(rx - ly, rx - lx);
-				if (ang < 0) ang += Math.PI * 2;
-				return straightW * 2 + Math.PI * rx + ang * rx;
-			}
-			return 0;
-		}
+		var MAX_LINES = 5;
 
 		function spawnLine() {
 			if (anim.lines.length >= MAX_LINES) return;
 			var W = geo.W, H = geo.H;
 			if (W === 0) return;
 
-			// Pick edge
 			var r = Math.random();
 			var edge = r < 0.25 ? 'top' : r < 0.5 ? 'left' : r < 0.75 ? 'right' : 'bottom';
 			var t = Math.random();
 
-			// Start point on section edge (rim)
 			var startX, startY;
 			if (edge === 'top') { startX = lerp(0, W, t); startY = 0; }
 			else if (edge === 'left') { startX = 0; startY = lerp(0, H, t); }
 			else if (edge === 'right') { startX = W; startY = lerp(0, H, t); }
 			else { startX = lerp(0, W, t); startY = H; }
 
-			// Target = nearest point on the ring border
-			var target = nearestRingPoint(startX, startY);
-			var totalDist = dist(startX, startY, target.x, target.y);
-			if (totalDist < 10) return; // too close
+			// Target = CTA button center
+			var targetX = geo.ctaCx, targetY = geo.ctaCy;
+			var totalDist = dist(startX, startY, targetX, targetY);
+			if (totalDist < 10) return;
 
 			var lineLen = rand(15, 40);
-			var SPEED = 0.04; // uniform slow speed: px per ms
+			var SPEED = 0.04;
 
 			var el = document.createElementNS(NS, 'line');
 			el.setAttribute('stroke', 'url(#pro-line-gradient)');
@@ -531,7 +528,7 @@
 			anim.lines.push({
 				el: el,
 				startX: startX, startY: startY,
-				targetX: target.x, targetY: target.y,
+				targetX: targetX, targetY: targetY,
 				totalDist: totalDist, lineLen: lineLen,
 				speed: SPEED, traveled: 0
 			});
@@ -549,80 +546,24 @@
 			var tx = lerp(line.startX, line.targetX, p2);
 			var ty = lerp(line.startY, line.targetY, p2);
 
-			line.el.setAttribute('x1', tx);
-			line.el.setAttribute('y1', ty);
-			line.el.setAttribute('x2', hx);
-			line.el.setAttribute('y2', hy);
+			line.el.setAttribute('x1', tx); line.el.setAttribute('y1', ty);
+			line.el.setAttribute('x2', hx); line.el.setAttribute('y2', hy);
 
-			// Trigger CTA spot glow when head reaches button
-			if (headD >= line.totalDist && !line.glowTriggered) {
-				line.glowTriggered = true;
-				var impactX = line.targetX;
-				var impactY = line.targetY;
-				// Get gradient color based on position along section width
-				var tt = impactX / geo.W;
-				var gradC = [[246,51,154],[0,188,125],[254,154,0]];
-				var c0, c1, bl;
-				if (tt < 0.33) { c0=gradC[0]; c1=gradC[1]; bl=tt/0.33; }
-				else if (tt < 0.66) { c0=gradC[1]; c1=gradC[2]; bl=(tt-0.33)/0.33; }
-				else { c0=gradC[2]; c1=gradC[0]; bl=(tt-0.66)/0.34; }
-				var color = 'rgb('+Math.round(c0[0]+(c1[0]-c0[0])*bl)+','+Math.round(c0[1]+(c1[1]-c0[1])*bl)+','+Math.round(c0[2]+(c1[2]-c0[2])*bl)+')';
-				createCtaGlow(impactX, impactY, color);
+			// Light up nearby icons
+			var LIGHT_RADIUS = 60;
+			for (var i = 0; i < iconGrid.length; i++) {
+				var ic = iconGrid[i];
+				var d = dist(hx, hy, ic.x, ic.y);
+				if (d < LIGHT_RADIUS) {
+					var str = (1 - d / LIGHT_RADIUS) * 0.8;
+					if (str > ic.currentOpacity) ic.currentOpacity = str;
+				}
 			}
+
 			return tailD >= line.totalDist;
 		}
 
-		// CTA ring hit: color a ~20px segment of the ring border at the touch point
-		function createCtaGlow(cx, cy, color) {
-			var ringSvg = document.getElementById('cta-ring-svg');
-			if (!ringSvg || !geo.ringPerimeter) return;
-
-			// Create a copy of the ring rect, but only show a small dash at the hit position
-			var seg = document.createElementNS(NS, 'rect');
-			seg.setAttribute('class', 'hit-seg');
-			seg.setAttribute('x', '0.5');
-			seg.setAttribute('y', '0.5');
-			seg.setAttribute('width', geo.ringW - 1);
-			seg.setAttribute('height', geo.ringH - 1);
-			seg.setAttribute('rx', geo.ringRx);
-			seg.setAttribute('fill', 'none');
-			seg.setAttribute('stroke', color);
-			seg.setAttribute('stroke-width', '1.5');
-
-			// Use stroke-dasharray to show only a ~20px segment
-			var segLen = 20;
-			var perim = geo.ringPerimeter;
-			var pos = hitToPerimeterPos(cx, cy);
-			// dasharray: gap before, visible segment, gap after
-			var dashBefore = pos - segLen / 2;
-			if (dashBefore < 0) dashBefore += perim;
-			seg.setAttribute('stroke-dasharray', '0 ' + dashBefore.toFixed(1) + ' ' + segLen + ' ' + (perim - dashBefore - segLen).toFixed(1));
-
-			ringSvg.appendChild(seg);
-
-			anim.glowSegments.push({
-				el: seg,
-				startTime: performance.now(),
-				duration: 1500
-			});
-		}
-
-		function updateCtaGlow(now) {
-			for (var i = anim.glowSegments.length - 1; i >= 0; i--) {
-				var g = anim.glowSegments[i];
-				var elapsed = now - g.startTime;
-				var progress = elapsed / g.duration;
-				if (progress >= 1) {
-					g.el.remove();
-					anim.glowSegments.splice(i, 1);
-				} else {
-					var fade = 1 - progress;
-					g.el.setAttribute('stroke-opacity', fade.toFixed(3));
-				}
-			}
-		}
-
-		var FRAME_MS = 16; // ~60fps
+		var FRAME_MS = 16;
 		var lastFrame = 0;
 		function animLoop() {
 			if (!animRunning) return;
@@ -630,24 +571,27 @@
 			var dt = lastFrame ? now - lastFrame : FRAME_MS;
 			lastFrame = now;
 
-			// Spawn timer
 			if (now - anim.lastSpawn > anim.nextDelay) {
 				spawnLine();
 				anim.lastSpawn = now;
 				anim.nextDelay = rand(600, 1500);
 			}
 
-			// Update lines (ripple is triggered inside updateLine when head reaches floor)
 			for (var i = anim.lines.length - 1; i >= 0; i--) {
 				var done = updateLine(anim.lines[i], dt);
-				if (done) {
-					anim.lines[i].el.remove();
-					anim.lines.splice(i, 1);
+				if (done) { anim.lines[i].el.remove(); anim.lines.splice(i, 1); }
+			}
+
+			// Decay icon opacity
+			for (var i = 0; i < iconGrid.length; i++) {
+				if (iconGrid[i].currentOpacity > 0) {
+					iconGrid[i].currentOpacity *= 0.97; // slow fade
+					if (iconGrid[i].currentOpacity < 0.01) iconGrid[i].currentOpacity = 0;
 				}
 			}
 
-			// Update all ripples in one pass (handles overlaps correctly)
-			updateCtaGlow(now);
+			// Re-render icons
+			renderIconCanvas();
 
 			animFrameId = setTimeout(animLoop, FRAME_MS);
 		}
@@ -666,64 +610,36 @@
 			if (animFrameId) clearTimeout(animFrameId);
 			var ag = document.getElementById('anim-blue-lines');
 			if (ag) ag.innerHTML = '';
-			// Clear glow spots
-			for (var i = 0; i < anim.glowSegments.length; i++) {
-				if (anim.glowSegments[i].el) anim.glowSegments[i].el.remove();
-			}
 			anim.lines = [];
-			anim.glowSegments = [];
 		}
 
-		// ==================== Init ====================
+		// Init
 		draw();
+		window.addEventListener('resize', function() { stopAnimation(); draw(); startAnimation(); });
+		window.addEventListener('themechange', function() { stopAnimation(); draw(); startAnimation(); });
+		if (document.fonts && document.fonts.ready) { document.fonts.ready.then(function() { draw(); }); }
 
-		window.addEventListener('resize', function() {
-			stopAnimation();
-			draw();
-			startAnimation();
-		});
-		window.addEventListener('themechange', function() {
-			stopAnimation();
-			draw();
-			startAnimation();
-		});
-		if (document.fonts && document.fonts.ready) {
-			document.fonts.ready.then(function() { draw(); });
-		}
-
-		// Preload 5 seconds of animation so it's already active on page load
-		(function preload() {
-			var PRELOAD_MS = 5000;
-			var step = FRAME_MS;
+		// Preload
+		(function() {
+			var PRELOAD_MS = 3000;
 			animRunning = true;
 			lastFrame = performance.now() - PRELOAD_MS;
 			anim.lastSpawn = lastFrame;
 			anim.nextDelay = rand(500, 1500);
-			for (var t = 0; t < PRELOAD_MS; t += step) {
-				var now = lastFrame + t + step;
-				var dt = step;
-				// Spawn
-				if (now - anim.lastSpawn > anim.nextDelay) {
-					spawnLine();
-					anim.lastSpawn = now;
-					anim.nextDelay = rand(600, 1500);
-				}
-				// Update lines
+			for (var t = 0; t < PRELOAD_MS; t += FRAME_MS) {
+				var now = lastFrame + t + FRAME_MS;
+				if (now - anim.lastSpawn > anim.nextDelay) { spawnLine(); anim.lastSpawn = now; anim.nextDelay = rand(600, 1500); }
 				for (var i = anim.lines.length - 1; i >= 0; i--) {
-					var done = updateLine(anim.lines[i], dt);
-					if (done) { anim.lines[i].el.remove(); anim.lines.splice(i, 1); }
+					if (updateLine(anim.lines[i], FRAME_MS)) { anim.lines[i].el.remove(); anim.lines.splice(i, 1); }
 				}
-				// Update ripples
-				updateCtaGlow(now);
+				for (var i = 0; i < iconGrid.length; i++) { iconGrid[i].currentOpacity *= 0.97; if (iconGrid[i].currentOpacity < 0.01) iconGrid[i].currentOpacity = 0; }
 				lastFrame = now;
 			}
-			anim.lastSpawn = performance.now() - (PRELOAD_MS - (anim.lastSpawn - (lastFrame - PRELOAD_MS + step)));
-			lastFrame = 0; // reset so animLoop calculates fresh dt
+			renderIconCanvas();
+			lastFrame = 0;
 			animRunning = false;
 		})();
 		startAnimation();
-
-		// Animation runs continuously — no pause on scroll
 	})();
 	</script>
 </body>
