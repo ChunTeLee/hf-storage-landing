@@ -114,8 +114,8 @@
 			</p>
 			<a id="cta-button"
 				href="/pro"
-				class="relative z-[1] mx-auto flex w-fit items-center gap-2 whitespace-nowrap rounded-full border border-[#f3f4f6] px-5 py-2 text-lg font-semibold text-black transition-all hover:bg-white dark:hover:bg-white bg-[#f3f4f6]"
-				style="margin-top: 40px;"
+				class="relative z-[1] mx-auto flex w-fit items-center gap-2 whitespace-nowrap rounded-full px-5 py-2 text-lg font-semibold text-black transition-all hover:bg-white dark:hover:bg-white bg-[#f3f4f6]"
+				style="margin-top: 40px; box-shadow: 0 0 0 4px var(--btn-ring-inner, #030712), 0 0 0 5px var(--btn-ring-outer, #f3f4f6);"
 			>
 				<span>&rarr;</span>
 				<span>Subscribe to HF PRO ($9/month)</span>
@@ -411,7 +411,7 @@
 		function buildIconGrid() {
 			iconGrid = [];
 			var W = geo.W, H = geo.H;
-			var spacing = 60; // px between icons
+			var spacing = 35; // tighter icon grid
 			var cols = Math.ceil(W / spacing);
 			var rows = Math.ceil(H / spacing);
 			for (var r = 0; r < rows; r++) {
@@ -452,10 +452,14 @@
 			var contentCy = fR ? (fR.top + fR.bottom) / 2 - sR.top : geo.H / 2;
 
 			var iconSize = 14;
-			var gradColors = [
-				[246,51,154], // pink
-				[0,188,125],  // green
-				[254,154,0]   // orange
+			// Original SVG fill colors per icon
+			var iconFills = [
+				null,       // proStar: uses gradient (draw manually)
+				'#51A2FF',  // storage
+				'#ffffff',  // zeroGPU
+				'#FEE685',  // credits
+				'#FF6467',  // dataset
+				'#FFB800'   // post
 			];
 
 			for (var i = 0; i < iconGrid.length; i++) {
@@ -472,19 +476,22 @@
 				var finalOp = op * contentFade;
 				if (finalOp < 0.01) continue;
 
-				// Pick color based on icon index
-				var ci = ic.iconIdx % gradColors.length;
-				var col = gradColors[ci];
-
 				ctx.save();
 				ctx.globalAlpha = finalOp;
 				ctx.translate(ic.x - iconSize / 2, ic.y - iconSize / 2);
 
-				// Draw the icon path
 				var p = new Path2D(ICON_PATHS[ic.iconIdx]);
-				ctx.fillStyle = 'rgb(' + col[0] + ',' + col[1] + ',' + col[2] + ')';
+				if (ic.iconIdx === 0) {
+					// proStar: use gradient
+					var grad = ctx.createLinearGradient(4.5, 4.6, 10.9, 11.9);
+					grad.addColorStop(0, '#FF0789');
+					grad.addColorStop(0.63, '#21DE75');
+					grad.addColorStop(1, '#FF8D00');
+					ctx.fillStyle = grad;
+				} else {
+					ctx.fillStyle = iconFills[ic.iconIdx] || '#ffffff';
+				}
 				ctx.fill(p);
-
 				ctx.restore();
 			}
 		}
