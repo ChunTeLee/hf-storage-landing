@@ -111,14 +111,14 @@
 				The all-in-one subscription to discover, use, and build with AI.
 			</p>
 			<div class="relative mx-auto w-fit" style="margin-top: 40px;">
-				<!-- SVG overlay for spot glow effects on CTA outline -->
-				<svg id="cta-ring-svg" class="absolute inset-0 pointer-events-none" overflow="visible">
-					<defs><filter id="glow-blur"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+				<!-- SVG ring border with 2px gap around CTA button -->
+				<svg id="cta-ring-svg" class="absolute pointer-events-none" overflow="visible">
+					<rect id="cta-ring-base" fill="none" stroke-width="0.667" rx="9999"/>
+					<!-- Hit segments will be appended here dynamically -->
 				</svg>
 				<a id="cta-button"
 					href="/pro"
 					class="relative z-[1] flex items-center gap-2 whitespace-nowrap rounded-full px-5 py-2 text-lg font-semibold text-black transition-all hover:bg-white dark:hover:bg-white bg-[#f3f4f6]"
-					style="border: 1px solid var(--cta-border-color, #141c2e);"
 				>
 					<span>&rarr;</span>
 					<span>Subscribe to HF PRO ($9/month)</span>
@@ -407,14 +407,38 @@
 			});
 			defsEl.appendChild(proGrad);
 
-			// Size CTA glow SVG to match button
+			// Position the ring SVG with 2px gap around button
+			var GAP = 2;
 			var ringSvg = document.getElementById('cta-ring-svg');
-			if (ringSvg) {
-				ringSvg.style.width = ctaR.width + 'px';
-				ringSvg.style.height = ctaR.height + 'px';
-				// Clear any leftover glow circles from previous draw
-				var oldGlows = ringSvg.querySelectorAll('circle');
-				oldGlows.forEach(function(c) { c.remove(); });
+			var ringBase = document.getElementById('cta-ring-base');
+			if (ringSvg && ringBase) {
+				var ringW = ctaR.width + GAP * 2;
+				var ringH = ctaR.height + GAP * 2;
+				ringSvg.style.left = -GAP + 'px';
+				ringSvg.style.top = -GAP + 'px';
+				ringSvg.style.width = ringW + 'px';
+				ringSvg.style.height = ringH + 'px';
+				ringSvg.setAttribute('viewBox', '0 0 ' + ringW + ' ' + ringH);
+				ringBase.setAttribute('x', '0.5');
+				ringBase.setAttribute('y', '0.5');
+				ringBase.setAttribute('width', ringW - 1);
+				ringBase.setAttribute('height', ringH - 1);
+				ringBase.setAttribute('rx', ringH / 2);
+				ringBase.setAttribute('stroke', getLineColor());
+				// Store ring geometry for hit detection
+				geo.ringLeft = geo.ctaLeft - GAP;
+				geo.ringTop = geo.ctaTop - GAP;
+				geo.ringRight = geo.ctaRight + GAP;
+				geo.ringBottom = geo.ctaBottom + GAP;
+				geo.ringW = ringW;
+				geo.ringH = ringH;
+				geo.ringRx = ringH / 2;
+				// Compute ring perimeter for dash positioning
+				var straightW = ringW - ringH; // straight portion (total width minus two semicircles)
+				geo.ringPerimeter = Math.PI * ringH + straightW * 2;
+				// Clear old hit segments
+				var oldSegs = ringSvg.querySelectorAll('.hit-seg');
+				oldSegs.forEach(function(s) { s.remove(); });
 			}
 		}
 
@@ -424,20 +448,51 @@
 		var MAX_LINES = 8;
 		var SPAWN_DIST = 50;
 
-		// Find nearest point on CTA button boundary (rounded rect) from a given point
-		function nearestCtaPoint(px, py) {
-			// Clamp to the rounded rect boundary
-			var cx = Math.max(geo.ctaLeft, Math.min(geo.ctaRight, px));
-			var cy = Math.max(geo.ctaTop, Math.min(geo.ctaBottom, py));
-			// Push to nearest edge
-			var dL = cx - geo.ctaLeft, dR = geo.ctaRight - cx;
-			var dT = cy - geo.ctaTop, dB = geo.ctaBottom - cy;
+		// Find nearest point on the ring boundary from a given point
+		function nearestRingPoint(px, py) {
+			var cx = Math.max(geo.ringLeft, Math.min(geo.ringRight, px));
+			var cy = Math.max(geo.ringTop, Math.min(geo.ringBottom, py));
+			var dL = cx - geo.ringLeft, dR = geo.ringRight - cx;
+			var dT = cy - geo.ringTop, dB = geo.ringBottom - cy;
 			var minD = Math.min(dL, dR, dT, dB);
-			if (minD === dL) cx = geo.ctaLeft;
-			else if (minD === dR) cx = geo.ctaRight;
-			else if (minD === dT) cy = geo.ctaTop;
-			else cy = geo.ctaBottom;
+			if (minD === dL) cx = geo.ringLeft;
+			else if (minD === dR) cx = geo.ringRight;
+			else if (minD === dT) cy = geo.ringTop;
+			else cy = geo.ringBottom;
 			return { x: cx, y: cy };
+		}
+
+		// Convert a hit point on the ring to a position along the perimeter (0 to perimeter)
+		// The rounded rect perimeter starts at top-left corner, goes clockwise
+		function hitToPerimeterPos(hx, hy) {
+			// Convert to ring-local coords
+			var lx = hx - geo.ringLeft;
+			var ly = hy - geo.ringTop;
+			var rW = geo.ringW, rH = geo.ringH;
+			var rx = geo.ringRx;
+			var straightW = rW - rH; // straight portion per side
+
+			// Top edge: from (rx, 0) to (rx + straightW, 0)
+			if (ly <= 0.5 && lx >= rx && lx <= rx + straightW) {
+				return lx - rx; // 0 to straightW
+			}
+			// Right semicircle: from top-right to bottom-right
+			if (lx >= rx + straightW) {
+				var ang = Math.atan2(ly - rx, lx - (rx + straightW));
+				if (ang < 0) ang += Math.PI * 2;
+				return straightW + ang * rx;
+			}
+			// Bottom edge: from (rx + straightW, rH) to (rx, rH)
+			if (ly >= rH - 0.5 && lx >= rx && lx <= rx + straightW) {
+				return straightW + Math.PI * rx + (rx + straightW - lx);
+			}
+			// Left semicircle: from bottom-left to top-left
+			if (lx <= rx) {
+				var ang = Math.atan2(rx - ly, rx - lx);
+				if (ang < 0) ang += Math.PI * 2;
+				return straightW * 2 + Math.PI * rx + ang * rx;
+			}
+			return 0;
 		}
 
 		function spawnLine() {
@@ -457,8 +512,8 @@
 			else if (edge === 'right') { startX = W; startY = lerp(0, H, t); }
 			else { startX = lerp(0, W, t); startY = H; }
 
-			// Target = nearest point on CTA button boundary
-			var target = nearestCtaPoint(startX, startY);
+			// Target = nearest point on the ring border
+			var target = nearestRingPoint(startX, startY);
 			var totalDist = dist(startX, startY, target.x, target.y);
 			if (totalDist < 10) return; // too close
 
@@ -517,25 +572,36 @@
 			return tailD >= line.totalDist;
 		}
 
-		// CTA spot glow: small ~20px glow on the outline at the touch point
+		// CTA ring hit: color a ~20px segment of the ring border at the touch point
 		function createCtaGlow(cx, cy, color) {
 			var ringSvg = document.getElementById('cta-ring-svg');
-			if (!ringSvg) return;
+			if (!ringSvg || !geo.ringPerimeter) return;
 
-			// Create a small glowing circle at the impact point, relative to the CTA button
-			var glowEl = document.createElementNS(NS, 'circle');
-			var localX = cx - geo.ctaLeft + 1; // +1 for SVG margin offset
-			var localY = cy - geo.ctaTop + 1;
-			glowEl.setAttribute('cx', localX);
-			glowEl.setAttribute('cy', localY);
-			glowEl.setAttribute('r', '10');
-			glowEl.setAttribute('fill', color);
-			glowEl.setAttribute('opacity', '0.6');
-			glowEl.setAttribute('filter', 'url(#glow-blur)');
-			ringSvg.appendChild(glowEl);
+			// Create a copy of the ring rect, but only show a small dash at the hit position
+			var seg = document.createElementNS(NS, 'rect');
+			seg.setAttribute('class', 'hit-seg');
+			seg.setAttribute('x', '0.5');
+			seg.setAttribute('y', '0.5');
+			seg.setAttribute('width', geo.ringW - 1);
+			seg.setAttribute('height', geo.ringH - 1);
+			seg.setAttribute('rx', geo.ringRx);
+			seg.setAttribute('fill', 'none');
+			seg.setAttribute('stroke', color);
+			seg.setAttribute('stroke-width', '1.5');
+
+			// Use stroke-dasharray to show only a ~20px segment
+			var segLen = 20;
+			var perim = geo.ringPerimeter;
+			var pos = hitToPerimeterPos(cx, cy);
+			// dasharray: gap before, visible segment, gap after
+			var dashBefore = pos - segLen / 2;
+			if (dashBefore < 0) dashBefore += perim;
+			seg.setAttribute('stroke-dasharray', '0 ' + dashBefore.toFixed(1) + ' ' + segLen + ' ' + (perim - dashBefore - segLen).toFixed(1));
+
+			ringSvg.appendChild(seg);
 
 			anim.glowSegments.push({
-				el: glowEl,
+				el: seg,
 				startTime: performance.now(),
 				duration: 1500
 			});
@@ -551,8 +617,7 @@
 					anim.glowSegments.splice(i, 1);
 				} else {
 					var fade = 1 - progress;
-					g.el.setAttribute('opacity', (fade * 0.6).toFixed(3));
-					g.el.setAttribute('r', (10 + progress * 5).toFixed(1));
+					g.el.setAttribute('stroke-opacity', fade.toFixed(3));
 				}
 			}
 		}
