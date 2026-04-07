@@ -140,8 +140,8 @@
 						<p class="mb-8 text-lg text-gray-600 dark:text-gray-400">Every model, dataset, and <a href="/storage" target="_blank" class="font-medium text-blue-600 hover:underline dark:text-blue-400">Storage Bucket</a> on the Hugging Face Hub gets fast, reliable storage that grows with your projects.<br><br>Hugging Face PRO bumps your private storage to <strong class="text-gray-900 dark:text-gray-200">1 TB</strong> and doubles your public limit to <strong class="text-gray-900 dark:text-gray-200">10 TB</strong>.</p>
 					</div>
 					<div id="storage-visual" class="relative overflow-hidden bg-blue-50/40 dark:bg-blue-950/10" style="min-height: 400px;">
-						<!-- Enlarged SVG repositioned so red bars sit upper-left focus -->
-						<svg id="city-svg" viewBox="100 0 550 400" fill="none" xmlns="http://www.w3.org/2000/svg" class="absolute" style="width: 160%; left: -15%; top: -10%;">
+						<!-- Full viewBox SVG, scaled and repositioned -->
+						<svg id="city-svg" viewBox="0 0 850 566" fill="none" xmlns="http://www.w3.org/2000/svg" class="absolute" style="width: 160%; left: -15%; top: -10%;">
 							<!-- Grid lines (lower opacity) -->
 							<g opacity="0.25">
 								<path d="M282.954 153.313L819.572 421.623" stroke="#364153" stroke-width="0.564"/><path d="M251.389 169.097L788.007 437.406" stroke="#364153" stroke-width="0.564"/><path d="M219.822 184.879L756.44 453.188" stroke="#364153" stroke-width="0.564"/><path d="M188.257 200.662L724.875 468.971" stroke="#364153" stroke-width="0.564"/><path d="M156.691 216.445L693.309 484.754" stroke="#364153" stroke-width="0.564"/><path d="M125.125 232.228L661.743 500.537" stroke="#364153" stroke-width="0.564"/><path d="M93.5596 248.011L630.178 516.32" stroke="#364153" stroke-width="0.564"/><path d="M61.9941 263.794L598.612 532.103" stroke="#364153" stroke-width="0.564"/><path d="M30.4277 279.576L567.046 547.885" stroke="#364153" stroke-width="0.564"/>
@@ -149,30 +149,26 @@
 							</g>
 							<g id="city-bars"></g>
 						</svg>
-						<!-- Labels with typewriter animation + animated lines -->
-						<div class="absolute top-6 right-6 z-10 font-mono text-xs text-gray-400 dark:text-gray-500" style="font-size: 12px;">
-							<!-- Public storage label -->
-							<div class="relative mb-6">
-								<div class="overflow-hidden whitespace-nowrap" style="width: 0;" id="label-public">
-									<span>Public storage: 10TB</span>
-								</div>
-								<svg class="absolute -bottom-2 left-0" width="200" height="12" overflow="visible">
-									<!-- Diamond start -->
-									<polygon id="diamond-public" points="0,6 4,2 8,6 4,10" fill="#F16060" opacity="0"/>
-									<!-- Animated line -->
-									<line id="line-public" x1="8" y1="6" x2="8" y2="6" stroke="#F16060" stroke-width="0.667" stroke-dasharray="2,2" opacity="0"/>
-								</svg>
+						<!-- Labels positioned near the red bars (from sketch) -->
+						<!-- Public storage: top-right, near top of tallest bar -->
+						<div class="absolute z-10 font-mono" style="top: 12%; right: 8%; font-size: 12px; color: #99A1AF;">
+							<div class="overflow-hidden whitespace-nowrap" style="width: 0;" id="label-public">
+								<span>Public storage: 10TB</span>
 							</div>
-							<!-- Private storage label -->
-							<div class="relative" style="margin-top: 40px;">
-								<div class="overflow-hidden whitespace-nowrap" style="width: 0;" id="label-private">
-									<span>Private storage: 1TB</span>
-								</div>
-								<svg class="absolute -bottom-2 left-0" width="200" height="12" overflow="visible">
-									<polygon id="diamond-private" points="0,6 4,2 8,6 4,10" fill="#F16060" opacity="0"/>
-									<line id="line-private" x1="8" y1="6" x2="8" y2="6" stroke="#F16060" stroke-width="0.667" stroke-dasharray="2,2" opacity="0"/>
-								</svg>
+							<svg class="mt-1" width="200" height="10" overflow="visible">
+								<polygon id="diamond-public" points="0,5 4,1 8,5 4,9" fill="#99A1AF" opacity="0"/>
+								<line id="line-public" x1="8" y1="5" x2="8" y2="5" stroke="#99A1AF" stroke-width="0.667" opacity="0"/>
+							</svg>
+						</div>
+						<!-- Private storage: below public, near second red bar -->
+						<div class="absolute z-10 font-mono" style="top: 28%; right: 5%; font-size: 12px; color: #99A1AF;">
+							<div class="overflow-hidden whitespace-nowrap" style="width: 0;" id="label-private">
+								<span>Private storage: 1TB</span>
 							</div>
+							<svg class="mt-1" width="200" height="10" overflow="visible">
+								<polygon id="diamond-private" points="0,5 4,1 8,5 4,9" fill="#99A1AF" opacity="0"/>
+								<line id="line-private" x1="8" y1="5" x2="8" y2="5" stroke="#99A1AF" stroke-width="0.667" opacity="0"/>
+							</svg>
 						</div>
 					</div>
 				</div>
