@@ -354,7 +354,7 @@
 
 		function isDark() { return document.documentElement.classList.contains('dark'); }
 		function getLineColor() { return isDark() ? '#141c2e' : '#e2e5ea'; }
-		function getDotFill(opacity) { return isDark() ? 'rgba(255,255,255,' + opacity + ')' : 'rgba(0,0,0,' + opacity + ')'; }
+		function getDotFill(opacity) { return isDark() ? '#141c2e' : '#e2e5ea'; }
 
 		function lerp(a, b, t) { return a + (b - a) * t; }
 		function dist(x1,y1,x2,y2) { return Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1)); }
@@ -490,8 +490,9 @@
 						var c = document.createElementNS(NS, 'circle');
 						c.setAttribute('cx', dx);
 						c.setAttribute('cy', dy);
-						c.setAttribute('r', 0.5);
-						c.setAttribute('fill', getDotFill(dotOpacity));
+						c.setAttribute('r', 1);
+						c.setAttribute('fill', getDotFill());
+						if (dotOpacity < maxDotOpacity) c.setAttribute('opacity', (dotOpacity / maxDotOpacity).toFixed(3));
 						c.dataset.baseOpacity = dotOpacity;
 						c.dataset.col = col;
 						c.dataset.row = row;
@@ -699,7 +700,7 @@
 				if (!newBlue[key]) {
 					var info = anim._prevBlue[key];
 					info.el.setAttribute('fill', getDotFill(info.baseOpacity));
-					info.el.setAttribute('r', '0.5');
+					info.el.setAttribute('r', '1');
 					info.el.removeAttribute('opacity');
 				}
 			}
@@ -757,7 +758,7 @@
 				for (var key in anim._prevBlue) {
 					var info = anim._prevBlue[key];
 					info.el.setAttribute('fill', getDotFill(info.baseOpacity));
-					info.el.setAttribute('r', '0.5');
+					info.el.setAttribute('r', '1');
 					info.el.removeAttribute('opacity');
 				}
 				anim._prevBlue = {};
