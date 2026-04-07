@@ -140,34 +140,38 @@
 						<p class="mb-8 text-lg text-gray-600 dark:text-gray-400">Every model, dataset, and <a href="/storage" target="_blank" class="font-medium text-blue-600 hover:underline dark:text-blue-400">Storage Bucket</a> on the Hugging Face Hub gets fast, reliable storage that grows with your projects.<br><br>Hugging Face PRO bumps your private storage to <strong class="text-gray-900 dark:text-gray-200">1 TB</strong> and doubles your public limit to <strong class="text-gray-900 dark:text-gray-200">10 TB</strong>.</p>
 					</div>
 					<div id="storage-visual" class="relative overflow-hidden bg-blue-50/40 dark:bg-blue-950/10" style="min-height: 400px;">
-						<!-- Full viewBox SVG, scaled and repositioned -->
-						<svg id="city-svg" viewBox="0 0 850 566" fill="none" xmlns="http://www.w3.org/2000/svg" class="absolute" style="width: 160%; left: -15%; top: -10%;">
-							<!-- Grid lines (lower opacity) -->
-							<g opacity="0.25">
+						<!-- Full viewBox SVG, scaled 170% and repositioned -->
+						<svg id="city-svg" viewBox="0 0 850 566" fill="none" xmlns="http://www.w3.org/2000/svg" class="absolute" style="width: 170%; left: -18%; top: -5%;">
+							<!-- Grid lines (full opacity) -->
+							<g opacity="0.5">
 								<path d="M282.954 153.313L819.572 421.623" stroke="#364153" stroke-width="0.564"/><path d="M251.389 169.097L788.007 437.406" stroke="#364153" stroke-width="0.564"/><path d="M219.822 184.879L756.44 453.188" stroke="#364153" stroke-width="0.564"/><path d="M188.257 200.662L724.875 468.971" stroke="#364153" stroke-width="0.564"/><path d="M156.691 216.445L693.309 484.754" stroke="#364153" stroke-width="0.564"/><path d="M125.125 232.228L661.743 500.537" stroke="#364153" stroke-width="0.564"/><path d="M93.5596 248.011L630.178 516.32" stroke="#364153" stroke-width="0.564"/><path d="M61.9941 263.794L598.612 532.103" stroke="#364153" stroke-width="0.564"/><path d="M30.4277 279.576L567.046 547.885" stroke="#364153" stroke-width="0.564"/>
 								<path d="M282.954 153.313L30.4277 279.577" stroke="#364153" stroke-width="0.564"/><path d="M314.52 169.097L61.9941 295.36" stroke="#364153" stroke-width="0.564"/><path d="M346.086 184.879L93.5596 311.142" stroke="#364153" stroke-width="0.564"/><path d="M377.651 200.662L125.125 326.925" stroke="#364153" stroke-width="0.564"/><path d="M409.218 216.445L156.691 342.708" stroke="#364153" stroke-width="0.564"/><path d="M440.783 232.228L188.257 358.491" stroke="#364153" stroke-width="0.564"/><path d="M472.348 248.011L219.822 374.274" stroke="#364153" stroke-width="0.564"/><path d="M503.915 263.794L251.389 390.057" stroke="#364153" stroke-width="0.564"/><path d="M535.48 279.576L282.954 405.839" stroke="#364153" stroke-width="0.564"/><path d="M567.046 295.359L314.52 421.622" stroke="#364153" stroke-width="0.564"/><path d="M598.612 311.143L346.086 437.406" stroke="#364153" stroke-width="0.564"/><path d="M630.178 326.925L377.651 453.188" stroke="#364153" stroke-width="0.564"/><path d="M661.743 342.708L409.217 468.971" stroke="#364153" stroke-width="0.564"/><path d="M693.309 358.491L440.783 484.754" stroke="#364153" stroke-width="0.564"/><path d="M724.875 374.273L472.349 500.537" stroke="#364153" stroke-width="0.564"/><path d="M756.44 390.057L503.914 516.32" stroke="#364153" stroke-width="0.564"/><path d="M788.007 405.84L535.48 532.103" stroke="#364153" stroke-width="0.564"/><path d="M819.572 421.622L567.046 547.885" stroke="#364153" stroke-width="0.564"/>
 							</g>
 							<g id="city-bars"></g>
 						</svg>
-						<!-- Labels positioned near the red bars (from sketch) -->
-						<!-- Public storage: top-right, near top of tallest bar -->
+						<!-- Labels: lines visible from start, text slides up on scroll -->
+						<style>
+							.storage-label-text { transform: translateY(100%); opacity: 0; transition: transform 0.6s ease-out, opacity 0.5s ease-out; }
+							.storage-label-text.visible { transform: translateY(0); opacity: 1; }
+						</style>
+						<!-- Public storage label -->
 						<div class="absolute z-10 font-mono" style="top: 12%; right: 8%; font-size: 12px; color: #99A1AF;">
-							<div class="overflow-hidden whitespace-nowrap" style="width: 0;" id="label-public">
-								<span>Public storage: 10TB</span>
+							<div class="overflow-hidden" style="height: 16px;">
+								<div class="storage-label-text whitespace-nowrap" id="label-public">Public storage: 10TB</div>
 							</div>
-							<svg class="mt-1" width="200" height="10" overflow="visible">
-								<polygon id="diamond-public" points="0,5 4,1 8,5 4,9" fill="#99A1AF" opacity="0"/>
-								<line id="line-public" x1="8" y1="5" x2="8" y2="5" stroke="#99A1AF" stroke-width="0.667" opacity="0"/>
+							<svg width="170" height="10" class="mt-0.5">
+								<polygon points="0,5 4,1 8,5 4,9" fill="#99A1AF"/>
+								<line x1="8" y1="5" x2="170" y2="5" stroke="#99A1AF" stroke-width="0.667"/>
 							</svg>
 						</div>
-						<!-- Private storage: below public, near second red bar -->
-						<div class="absolute z-10 font-mono" style="top: 28%; right: 5%; font-size: 12px; color: #99A1AF;">
-							<div class="overflow-hidden whitespace-nowrap" style="width: 0;" id="label-private">
-								<span>Private storage: 1TB</span>
+						<!-- Private storage label (50% closer) -->
+						<div class="absolute z-10 font-mono" style="top: 22%; right: 5%; font-size: 12px; color: #99A1AF;">
+							<div class="overflow-hidden" style="height: 16px;">
+								<div class="storage-label-text whitespace-nowrap" id="label-private">Private storage: 1TB</div>
 							</div>
-							<svg class="mt-1" width="200" height="10" overflow="visible">
-								<polygon id="diamond-private" points="0,5 4,1 8,5 4,9" fill="#99A1AF" opacity="0"/>
-								<line id="line-private" x1="8" y1="5" x2="8" y2="5" stroke="#99A1AF" stroke-width="0.667" opacity="0"/>
+							<svg width="170" height="10" class="mt-0.5">
+								<polygon points="0,5 4,1 8,5 4,9" fill="#99A1AF"/>
+								<line x1="8" y1="5" x2="170" y2="5" stroke="#99A1AF" stroke-width="0.667"/>
 							</svg>
 						</div>
 					</div>
@@ -1045,57 +1049,12 @@
 		// Show flat diamonds initially
 		renderBars();
 
-		// ===== Typewriter + line animation for labels =====
+		// ===== Slide-up label animation =====
 		function animateLabels() {
-			typewriterLabel('label-public', 'diamond-public', 'line-public', 0);
-			typewriterLabel('label-private', 'diamond-private', 'line-private', 800);
-		}
-
-		function typewriterLabel(labelId, diamondId, lineId, delay) {
-			var labelEl = document.getElementById(labelId);
-			var diamondEl = document.getElementById(diamondId);
-			var lineEl = document.getElementById(lineId);
-			if (!labelEl) return;
-
-			var text = labelEl.querySelector('span').textContent;
-			var charCount = text.length;
-			var charWidth = 7.2; // approx width per char at 12px IBM Plex Mono
-			var fullWidth = charCount * charWidth;
-
-			setTimeout(function() {
-				// Phase 1: Typewriter — grow width char by char
-				var charIdx = 0;
-				var typeInterval = setInterval(function() {
-					charIdx++;
-					labelEl.style.width = (charIdx * charWidth) + 'px';
-					if (charIdx >= charCount) {
-						clearInterval(typeInterval);
-						// Phase 2: Diamond appears
-						setTimeout(function() {
-							diamondEl.setAttribute('opacity', '1');
-							// Phase 3: Line grows with fade
-							animateLine(lineEl, fullWidth + 20);
-						}, 200);
-					}
-				}, 50);
-			}, delay);
-		}
-
-		function animateLine(lineEl, targetLen) {
-			lineEl.setAttribute('opacity', '1');
-			var startTime = performance.now();
-			var duration = 600;
-			function step() {
-				var elapsed = performance.now() - startTime;
-				var progress = Math.min(1, elapsed / duration);
-				var eased = 1 - Math.pow(1 - progress, 2); // ease out
-				var len = 8 + eased * targetLen;
-				var fade = 1 - progress * 0.5; // fade from 1 to 0.5
-				lineEl.setAttribute('x2', len);
-				lineEl.setAttribute('opacity', fade.toFixed(2));
-				if (progress < 1) requestAnimationFrame(step);
-			}
-			requestAnimationFrame(step);
+			var pub = document.getElementById('label-public');
+			var priv = document.getElementById('label-private');
+			if (pub) setTimeout(function() { pub.classList.add('visible'); }, 0);
+			if (priv) setTimeout(function() { priv.classList.add('visible'); }, 300);
 		}
 	})();
 	</script>
