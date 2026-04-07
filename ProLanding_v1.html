@@ -143,7 +143,7 @@
 						<!-- Full viewBox SVG, scaled 170% and repositioned -->
 						<svg id="city-svg" viewBox="0 0 850 566" fill="none" xmlns="http://www.w3.org/2000/svg" class="absolute" style="width: 170%; left: -18%; top: -5%;">
 							<!-- Grid lines (full opacity) -->
-							<g opacity="0.5">
+							<g opacity="0.5" class="storage-grid">
 								<path d="M282.954 153.313L819.572 421.623" stroke="#364153" stroke-width="0.564"/><path d="M251.389 169.097L788.007 437.406" stroke="#364153" stroke-width="0.564"/><path d="M219.822 184.879L756.44 453.188" stroke="#364153" stroke-width="0.564"/><path d="M188.257 200.662L724.875 468.971" stroke="#364153" stroke-width="0.564"/><path d="M156.691 216.445L693.309 484.754" stroke="#364153" stroke-width="0.564"/><path d="M125.125 232.228L661.743 500.537" stroke="#364153" stroke-width="0.564"/><path d="M93.5596 248.011L630.178 516.32" stroke="#364153" stroke-width="0.564"/><path d="M61.9941 263.794L598.612 532.103" stroke="#364153" stroke-width="0.564"/><path d="M30.4277 279.576L567.046 547.885" stroke="#364153" stroke-width="0.564"/>
 								<path d="M282.954 153.313L30.4277 279.577" stroke="#364153" stroke-width="0.564"/><path d="M314.52 169.097L61.9941 295.36" stroke="#364153" stroke-width="0.564"/><path d="M346.086 184.879L93.5596 311.142" stroke="#364153" stroke-width="0.564"/><path d="M377.651 200.662L125.125 326.925" stroke="#364153" stroke-width="0.564"/><path d="M409.218 216.445L156.691 342.708" stroke="#364153" stroke-width="0.564"/><path d="M440.783 232.228L188.257 358.491" stroke="#364153" stroke-width="0.564"/><path d="M472.348 248.011L219.822 374.274" stroke="#364153" stroke-width="0.564"/><path d="M503.915 263.794L251.389 390.057" stroke="#364153" stroke-width="0.564"/><path d="M535.48 279.576L282.954 405.839" stroke="#364153" stroke-width="0.564"/><path d="M567.046 295.359L314.52 421.622" stroke="#364153" stroke-width="0.564"/><path d="M598.612 311.143L346.086 437.406" stroke="#364153" stroke-width="0.564"/><path d="M630.178 326.925L377.651 453.188" stroke="#364153" stroke-width="0.564"/><path d="M661.743 342.708L409.217 468.971" stroke="#364153" stroke-width="0.564"/><path d="M693.309 358.491L440.783 484.754" stroke="#364153" stroke-width="0.564"/><path d="M724.875 374.273L472.349 500.537" stroke="#364153" stroke-width="0.564"/><path d="M756.44 390.057L503.914 516.32" stroke="#364153" stroke-width="0.564"/><path d="M788.007 405.84L535.48 532.103" stroke="#364153" stroke-width="0.564"/><path d="M819.572 421.622L567.046 547.885" stroke="#364153" stroke-width="0.564"/>
 							</g>
@@ -153,26 +153,32 @@
 						<style>
 							.storage-label-text { transform: translateY(100%); opacity: 0; transition: transform 0.6s ease-out, opacity 0.5s ease-out; }
 							.storage-label-text.visible { transform: translateY(0); opacity: 1; }
+							.storage-diamond { fill: #c9cdd5; }
+							.dark .storage-diamond { fill: #364153; }
+							.storage-line-stop { stop-color: #c9cdd5; }
+							.dark .storage-line-stop { stop-color: #364153; }
+							.storage-grid path { stroke: #d1d5db; }
+							.dark .storage-grid path { stroke: #364153; }
 						</style>
 						<!-- Public storage label -->
-						<div class="absolute z-10 font-mono" style="top: 12%; right: calc(8% + 120px); font-size: 12px; color: #99A1AF;">
+						<div class="absolute z-10 font-mono text-gray-500 dark:text-[#99A1AF]" style="top: 12%; right: calc(8% + 120px); font-size: 12px;">
 							<div class="overflow-hidden" style="height: 16px; padding-left: 5px;">
 								<div class="storage-label-text whitespace-nowrap" id="label-public">Public storage: 10TB</div>
 							</div>
 							<svg width="170" height="10" class="mt-0.5">
-								<defs><linearGradient id="line-fade-1" gradientUnits="userSpaceOnUse" x1="8" y1="5" x2="170" y2="5"><stop offset="0%" stop-color="#364153"/><stop offset="100%" stop-color="#364153" stop-opacity="0"/></linearGradient></defs>
-								<polygon points="0,5 4,1 8,5 4,9" fill="#364153"/>
+								<defs><linearGradient id="line-fade-1" gradientUnits="userSpaceOnUse" x1="8" y1="5" x2="170" y2="5"><stop offset="0%" class="storage-line-stop"/><stop offset="100%" class="storage-line-stop" stop-opacity="0"/></linearGradient></defs>
+								<polygon points="0,5 4,1 8,5 4,9" class="storage-diamond"/>
 								<line x1="8" y1="5" x2="170" y2="5" stroke="url(#line-fade-1)" stroke-width="0.667"/>
 							</svg>
 						</div>
 						<!-- Private storage label -->
-						<div class="absolute z-10 font-mono" style="top: 22%; right: calc(5% + 120px); font-size: 12px; color: #99A1AF;">
+						<div class="absolute z-10 font-mono text-gray-500 dark:text-[#99A1AF]" style="top: 22%; right: calc(5% + 120px); font-size: 12px;">
 							<div class="overflow-hidden" style="height: 16px; padding-left: 5px;">
 								<div class="storage-label-text whitespace-nowrap" id="label-private">Private storage: 1TB</div>
 							</div>
 							<svg width="170" height="10" class="mt-0.5">
-								<defs><linearGradient id="line-fade-2" gradientUnits="userSpaceOnUse" x1="8" y1="5" x2="170" y2="5"><stop offset="0%" stop-color="#364153"/><stop offset="100%" stop-color="#364153" stop-opacity="0"/></linearGradient></defs>
-								<polygon points="0,5 4,1 8,5 4,9" fill="#364153"/>
+								<defs><linearGradient id="line-fade-2" gradientUnits="userSpaceOnUse" x1="8" y1="5" x2="170" y2="5"><stop offset="0%" class="storage-line-stop"/><stop offset="100%" class="storage-line-stop" stop-opacity="0"/></linearGradient></defs>
+								<polygon points="0,5 4,1 8,5 4,9" class="storage-diamond"/>
 								<line x1="8" y1="5" x2="170" y2="5" stroke="url(#line-fade-2)" stroke-width="0.667"/>
 							</svg>
 						</div>
